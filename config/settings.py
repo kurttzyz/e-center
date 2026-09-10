@@ -8,8 +8,21 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "change-this-before-production"
-DEBUG = True
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+DEBUG = False
+
+ALLOWED_HOSTS = [
+    "bestspecialproject.com",
+    "www.bestspecialproject.com",
+    "162.0.225.31",
+    "127.0.0.1",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://bestspecialproject.com",
+    "https://www.bestspecialproject.com",
+]
+
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
