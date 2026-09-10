@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Your tracking QR | E-Center Assist{% endblock %}
+{% block content %}
+<section class="page-section shell narrow">
+  {% include 'portal/_steps.html' with step=4 %}
+  <div class="success-heading"><span class="success-check">✓</span><span class="eyebrow">Tracking created</span><h1>Keep this QR and passkey</h1><p>Use either one when you return to check the transaction status.</p></div>
+  <article class="qr-card">
+    <div class="qr-image-wrap"><img src="data:image/png;base64,{{ qr_data }}" alt="Tracking QR code for {{ tracking_id }}"></div>
+    <div class="tracking-meta"><small>Tracking reference</small><strong>{{ tracking_id }}</strong></div>
+    <div class="passkey-display"><div><small>Passkey</small><strong id="passkey-value">{{ passkey }}</strong></div><button type="button" data-copy-passkey>Copy</button></div>
+    <p class="safe-note">This QR contains only a random tracking reference. It does not contain your SS number, password, OTP, or uploaded documents.</p>
+  </article>
+  <div class="button-row"><button class="button button-primary" type="button" onclick="window.print()">Print or save</button><a class="button button-secondary" href="{% url 'home' %}">Finish</a></div>
+</section>
+{% endblock %}
+

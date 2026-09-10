@@ -1,0 +1,51 @@
+# Virtual environment
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+/migrations
+
+
+# Environment variables
+.env
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Django static folders
+**/static/
+
+# SQLite database
+db.sqlite3
+*.sqlite3
+
+# Django migrations
+**/migrations/
+!**/migrations/__init__.py
+
+# Secrets
+
+.env.*
+!.env.example
+
+# Databases
+*.sqlite3-journal
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*.log
+
+# Django generated files
+staticfiles/
+media/
+
+# IDE and operating system
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

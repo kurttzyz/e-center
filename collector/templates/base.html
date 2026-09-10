@@ -1,0 +1,80 @@
+{% load static %}
+<!doctype html>
+<html lang="en" data-theme="light" data-text-size="normal">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Accessible E-Center transaction assistance">
+  <script>
+  (function () {
+    const theme = localStorage.getItem("ecenter-theme") || "light";
+    const textSize =
+      localStorage.getItem("ecenter-text-size") || "normal";
+
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.dataset.textSize = textSize;
+  })();
+</script>
+
+  <title>{% block title %}E-Center Assist{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'portal/css/app.css' %}">
+  <script defer src="{% static 'portal/js/app.js' %}"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <header class="site-header">
+    <div class="shell nav-shell">
+      <a class="brand" href="{% url 'home' %}" aria-label="E-Center Assist home">
+        <span class="brand-mark" aria-hidden="true">EA</span>
+        <span><strong>E-Center Assist</strong><small>Member support portal</small></span>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+      <nav id="site-nav" class="site-nav" aria-label="Main navigation">
+        <a href="{% url 'home' %}">Home</a>
+        <a href="{% url 'services' %}">Services</a>
+        <a href="{% url 'scan' %}">Scan QR</a>
+        <a href="{% url 'passkey' %}">Passkey</a>
+       <button
+          class="icon-button"
+          data-theme-toggle
+          type="button"
+          aria-label="Enable dark mode"
+          aria-pressed="false"
+        >
+          <span data-theme-icon aria-hidden="true">☾</span>
+        </button>
+
+        <button
+          class="text-button"
+          data-text-size-toggle
+          type="button"
+          aria-label="Enable large text"
+          aria-pressed="false"
+        >
+          A+
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  {% if messages %}
+  <div class="shell alerts" aria-live="polite">
+    {% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>{% endfor %}
+  </div>
+  {% endif %}
+
+  <main id="main-content">{% block content %}{% endblock %}</main>
+
+  <footer class="site-footer">
+    <div class="shell footer-grid">
+      <div><strong>E-Center Assist</strong><p>A guided support layer for clearer, more dignified public service.</p></div>
+      <div><strong>Need help?</strong><p>Ask an E-Center staff member at any point.</p></div>
+      <div><strong>Privacy</strong><p>Never enter a password, OTP, or confidential document into a tracking code.</p></div>
+    </div>
+  </footer>
+</body>
+</html>
+

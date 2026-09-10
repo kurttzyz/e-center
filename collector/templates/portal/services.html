@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Choose a service | E-Center Assist{% endblock %}
+{% block content %}
+<section class="page-section shell">
+  {% include 'portal/_steps.html' with step=1 %}
+  <div class="page-heading"><div><span class="eyebrow">Step 1 of 4</span><h1>What do you need help with?</h1><p>Select one service to view its requirements and begin assistance.</p></div><a class="button button-secondary" href="{% url 'scan' %}">I already have a QR</a></div>
+  <div class="service-grid">
+    {% for group in services %}
+    <article class="service-card">
+      <div class="service-card-head"><span class="service-icon">{% if group.icon == 'heart' %}♥{% elif group.icon == 'wallet' %}▣{% else %}◆{% endif %}</span><div><p>Category</p><h2>{{ group.group }}</h2></div></div>
+      <ul>{% for item in group.items %}<li><a href="{% url 'transaction' %}"><span>{{ item }}</span><b>→</b></a></li>{% endfor %}</ul>
+    </article>
+    {% endfor %}
+  </div>
+  <div class="assist-strip"><div><strong>I don’t understand the choices</strong><p>A staff member can explain each category without making the decision for you.</p></div><button class="button button-secondary" type="button" data-help>Request assistance</button></div>
+</section>
+{% endblock %}
+

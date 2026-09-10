@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Enter passkey | E-Center Assist{% endblock %}
+{% block content %}
+<section class="page-section shell narrow">
+  {% include 'portal/_steps.html' with step=2 %}
+  <div class="center-heading"><span class="eyebrow">Find your transaction</span><h1>Enter your passkey</h1><p>The code is shown below the QR on your transaction receipt.</p></div>
+  <form class="form-card" method="post">
+    {% csrf_token %}
+    <label for="passkey">Transaction passkey</label>
+    <div class="input-with-action"><input id="passkey" name="passkey" minlength="6" maxlength="12" autocomplete="one-time-code" placeholder="Example: A7K9P2QX" required autofocus><button type="button" data-clear-input aria-label="Clear passkey">×</button></div>
+    <p class="field-help">6–12 letters or numbers. This is not your My.SSS password.</p>
+    <button class="button button-primary button-full" type="submit">Find my transaction</button>
+    <a class="text-link" href="{% url 'scan' %}">I want to scan a QR instead</a>
+  </form>
+  <div class="privacy-note"><span>✓</span><p><strong>Your privacy matters.</strong> Staff should never ask for your password or OTP through this portal.</p></div>
+</section>
+{% endblock %}
+

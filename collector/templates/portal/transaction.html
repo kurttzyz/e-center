@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Review transaction | E-Center Assist{% endblock %}
+{% block content %}
+<section class="page-section shell">
+  {% include 'portal/_steps.html' with step=3 %}
+  <div class="page-heading"><div><span class="eyebrow">Step 3 of 4</span><h1>Review transaction details</h1><p>Confirm the information and requirements before generating a tracking QR.</p></div><span class="badge badge-warning">Needs follow-up</span></div>
+  <div class="details-layout">
+    <article class="detail-card">
+      <div class="card-title"><div><p>Member reference</p><h2>{{ member.name }}</h2></div><span class="badge">{{ member.reference }}</span></div>
+      <dl class="summary-grid"><div><dt>Transaction</dt><dd>Disbursement Account Enrollment</dd></div><div><dt>Current stage</dt><dd>Document verification</dd></div><div><dt>Date started</dt><dd>September 10, 2026</dd></div><div><dt>Assigned counter</dt><dd>E-Center Counter 1</dd></div></dl>
+      <div class="timeline"><div class="complete"><span></span><div><strong>Transaction registered</strong><small>Member concern and basic requirements recorded.</small></div></div><div class="active"><span></span><div><strong>Waiting for lacking document</strong><small>Bring the item listed below for verification.</small></div></div><div><span></span><div><strong>Completion</strong><small>Staff confirms final status.</small></div></div></div>
+    </article>
+    <aside class="requirements-stack">
+      <section class="requirement-card good"><h2><span>✓</span> Submitted documents</h2><ul>{% for item in submitted %}<li>{{ item }}</li>{% endfor %}</ul></section>
+      <section class="requirement-card danger"><h2><span>!</span> Lacking documents</h2><ul>{% for item in lacking %}<li>{{ item }}</li>{% endfor %}</ul></section>
+    </aside>
+  </div>
+  <form class="action-bar" method="post">{% csrf_token %}<input type="hidden" name="transaction_type" value="Disbursement Account Enrollment"><a class="button button-secondary" href="{% url 'services' %}">Back to services</a><button class="button button-primary" type="submit">Generate tracking QR</button></form>
+</section>
+{% endblock %}
+

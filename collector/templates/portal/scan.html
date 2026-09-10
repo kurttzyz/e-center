@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Scan QR | E-Center Assist{% endblock %}
+{% block content %}
+<section class="page-section shell narrow">
+  {% include 'portal/_steps.html' with step=2 %}
+  <div class="center-heading"><span class="eyebrow">Find your transaction</span><h1>Scan or upload your QR code</h1><p>Place the code inside the frame, or upload a clear image from your device.</p></div>
+  <form class="scanner-card" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="scan-frame" data-drop-zone>
+      <div class="scan-corners"></div><div class="camera-icon">▦</div>
+      <strong data-file-label>Ready to scan</strong><small>Supported image: JPG, PNG or WEBP</small>
+    </div>
+    <input id="qr_image" name="qr_image" type="file" accept="image/png,image/jpeg,image/webp" hidden data-file-input>
+    <div class="button-row"><button class="button button-primary" type="button" data-camera>Open camera</button><label class="button button-secondary" for="qr_image">Upload QR image</label></div>
+    <button class="button button-success button-full" type="submit">Continue with selected image</button>
+  </form>
+  <div class="alternative"><span>or</span></div>
+  <a class="passkey-link" href="{% url 'passkey' %}"><span>⌨</span><div><strong>Use your passkey instead</strong><small>Enter the short code printed with your QR.</small></div><b>→</b></a>
+</section>
+{% endblock %}
+
