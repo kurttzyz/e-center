@@ -95,7 +95,7 @@ def scan_qr(request):
     if request.method == "POST":
         if request.FILES.get("qr_image"):
             messages.success(request, "QR image received. Demo mode opened the sample transaction.")
-            return redirect("portal:transaction")
+            return redirect("transaction")
         messages.error(request, "Please choose a QR image first.")
     return render(request, "portal/scan.html")
 
@@ -105,7 +105,7 @@ def passkey(request):
         code = request.POST.get("passkey", "").strip()
         if len(code) >= 6:
             request.session["lookup_passkey"] = code
-            return redirect("portal:transaction")
+            return redirect("transaction")
         messages.error(request, "Enter the 6–12 character passkey shown on the member's receipt.")
     return render(request, "portal/passkey.html")
 
