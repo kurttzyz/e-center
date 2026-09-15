@@ -14,7 +14,7 @@ urlpatterns = [
     path("services/", views.services, name="services"),
     path("scan/", views.scan_qr, name="scan"),
     path("passkey/", views.passkey, name="passkey"),
-    path("transaction/", views.transaction, name="transaction"),
+    # path("transaction/", views.transaction, name="transaction"),
     path("qr-result/<uuid:pk>/", views.qr_result, name="qr_result"),
 
 ]
