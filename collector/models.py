@@ -38,7 +38,8 @@ class Transaction(models.Model):
         max_length=20,
         unique=True,
         db_index=True,
-        editable=False
+        editable=False,
+        null=True,
     )
 
     passkey = models.CharField(
