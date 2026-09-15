@@ -8,7 +8,7 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "change-this-before-production"
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     "bestspecialproject.com",
