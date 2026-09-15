@@ -45,7 +45,9 @@ class Transaction(models.Model):
         max_length=12,
         unique=True,
         db_index=True,
-        editable=False
+        editable=False,
+        null=True,
+        blank=True,
     )
 
     ebqs_number = models.CharField(
