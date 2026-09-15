@@ -10,7 +10,7 @@
     <div class="passkey-display"><div><small>Passkey</small><strong id="passkey-value">{{ passkey }}</strong></div><button type="button" data-copy-passkey>Copy</button></div>
     <p class="safe-note">This QR contains only a random tracking reference. It does not contain your SS number, password, OTP, or uploaded documents.</p>
   </article>
-  <div class="button-row"><button class="button button-primary" type="button" onclick="window.print()">Print or save</button><a class="button button-secondary" href="{% url 'home' %}">Finish</a></div>
+  <div class="button-row"><button class="button button-primary" type="button" onclick="window.print()">Print or save</button><a class="button button-secondary" href="{% url 'dashboard' %}">Finish</a></div>
 </section>
 {% endblock %}
 
