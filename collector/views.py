@@ -115,7 +115,7 @@ def transaction(request):
         tracking_id = f"ECT-{uuid4().hex[:10].upper()}"
         request.session["tracking_id"] = tracking_id
         request.session["transaction_type"] = request.POST.get("transaction_type", "E-Center Assistance")
-        return redirect("portal:qr_result")
+        return redirect("collector:qr_result")
     return render(request, "portal/transaction.html", {
         "member": {"reference": "•••••••678", "name": "Sample Member"},
         "submitted": ["Valid government-issued ID", "Member information form"],
