@@ -1,4 +1,9 @@
 import csv
+import base64
+from io import BytesIO
+
+import qrcode
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
@@ -7,15 +12,9 @@ from django.db.models import Count, Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+
 from .forms import CompletionForm, EventForm, TransactionForm
 from .models import Transaction, TransactionEvent
-import base64
-from io import BytesIO
-from uuid import uuid4
-import qrcode
-from django.contrib import messages
-from django.shortcuts import redirect, render
-
 
 @login_required
 def dashboard(request):
@@ -32,7 +31,7 @@ def create_transaction(request):
         with db_transaction.atomic():
             item=form.save(False);item.created_by=request.user;item.save()
             TransactionEvent.objects.create(transaction=item,event_type="created",stage="received",occurred_at=item.received_at,remarks="Transaction registered",recorded_by=request.user)
-        messages.success(request,"Transaction registered.");return redirect("transaction_detail",pk=item.pk)
+        messages.success(request,"Transaction registered.");return redirect("qr_result",pk=item.pk) #it was transaction_detail vefore
     return render(request,"collector/form.html",{"form":form,"title":"Register transaction","submit_label":"Save research record"})
 
 @login_required
@@ -102,39 +101,105 @@ def scan_qr(request):
 
 def passkey(request):
     if request.method == "POST":
-        code = request.POST.get("passkey", "").strip()
-        if len(code) >= 6:
-            request.session["lookup_passkey"] = code
-            return redirect("transaction")
-        messages.error(request, "Enter the 6–12 character passkey shown on the member's receipt.")
+        code = request.POST.get("passkey", "").strip().upper()
+
+        if not code:
+            messages.error(
+                request,
+                "Please enter your transaction passkey."
+            )
+            return render(request, "portal/passkey.html")
+
+        item = Transaction.objects.filter(
+            passkey=code
+        ).first()
+
+        if not item:
+            messages.error(
+                request,
+                "Invalid passkey. Please check your receipt and try again."
+            )
+            return render(request, "portal/passkey.html")
+
+        return redirect(
+            "transaction_status",
+            tracking_id=item.tracking_id
+        )
+
     return render(request, "portal/passkey.html")
 
 
-def transaction(request):
-    if request.method == "POST":
-        tracking_id = f"ECT-{uuid4().hex[:10].upper()}"
-        request.session["tracking_id"] = tracking_id
-        request.session["transaction_type"] = request.POST.get("transaction_type", "E-Center Assistance")
-        return redirect("qr_result")
-    return render(request, "portal/transaction.html", {
-        "member": {"reference": "•••••••678", "name": "Sample Member"},
-        "submitted": ["Valid government-issued ID", "Member information form"],
-        "lacking": ["Validated deposit slip with visible name and account number"],
-    })
+def transaction_status(request, tracking_id):
+    item = get_object_or_404(
+        Transaction.objects.prefetch_related("events"),
+        tracking_id=tracking_id
+    )
+
+    return render(
+        request,
+        "portal/transaction_status.html",
+        {
+            "transaction": item,
+        }
+    )
+
+# def transaction(request):
+#     if request.method == "POST":
+#         tracking_id = f"ECT-{uuid4().hex[:10].upper()}"
+#         request.session["tracking_id"] = tracking_id
+#         request.session["transaction_type"] = request.POST.get("transaction_type", "E-Center Assistance")
+#         return redirect("qr_result")
+#     return render(request, "portal/transaction.html", {
+#         "member": {"reference": "•••••••678", "name": "Sample Member"},
+#         "submitted": ["Valid government-issued ID", "Member information form"],
+#         "lacking": ["Validated deposit slip with visible name and account number"],
+#     })
 
 
-def qr_result(request):
-    tracking_id = request.session.get("tracking_id", "ECT-DEMO2026")
-    passkey_value = uuid4().hex[:8].upper()
-    # The QR contains only a random tracking reference—never SS numbers, OTPs, or documents.
-    qr = qrcode.make(f"ECENTER-TRACKING:{tracking_id}")
+# def qr_result(request):
+#     tracking_id = request.session.get("tracking_id", "ECT-DEMO2026")
+#     passkey_value = uuid4().hex[:8].upper()
+#     # The QR contains only a random tracking reference—never SS numbers, OTPs, or documents.
+#     qr = qrcode.make(f"ECENTER-TRACKING:{tracking_id}")
+#     stream = BytesIO()
+#     qr.save(stream, format="PNG")
+#     qr_data = base64.b64encode(stream.getvalue()).decode("ascii")
+#     return render(request, "portal/qr_result.html", {
+#         "tracking_id": tracking_id,
+#         "passkey": passkey_value,
+#         "qr_data": qr_data,
+#     })
+@login_required
+def qr_result(request, pk):
+    item = get_object_or_404(
+        Transaction.objects.prefetch_related("events"),
+        pk=pk
+    )
+
+    status_url = request.build_absolute_uri(
+        f"/status/{item.tracking_id}/"
+    )
+
+    qr = qrcode.make(status_url)
+
     stream = BytesIO()
     qr.save(stream, format="PNG")
-    qr_data = base64.b64encode(stream.getvalue()).decode("ascii")
-    return render(request, "portal/qr_result.html", {
-        "tracking_id": tracking_id,
-        "passkey": passkey_value,
-        "qr_data": qr_data,
-    })
 
+    qr_data = base64.b64encode(
+        stream.getvalue()
+    ).decode("ascii")
+
+    return render(
+        request,
+        "portal/qr_result.html",
+        {
+            "transaction": item,
+            "qr_data": qr_data,
+        }
+    )
+
+
+# def generate_passkey():
+#     characters = string.ascii_uppercase + string.digits
+#     return "".join(secrets.choice(characters) for _ in range(8))
 

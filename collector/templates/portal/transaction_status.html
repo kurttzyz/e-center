@@ -1,0 +1,368 @@
+```html
+{% extends 'base.html' %}
+
+{% block title %}Transaction Status | E-Center Assist{% endblock %}
+
+{% block content %}
+
+<section class="page-section shell">
+
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">Transaction tracking</span>
+
+      <h1>Transaction Status</h1>
+
+      <p>
+        View the latest status and progress of your E-Center transaction.
+      </p>
+    </div>
+
+    {% if transaction.status == "active" %}
+      <span class="badge badge-warning">
+        Active
+      </span>
+
+    {% elif transaction.status == "completed" %}
+      <span class="badge badge-success">
+        Completed
+      </span>
+
+    {% elif transaction.status == "cancelled" %}
+      <span class="badge">
+        Cancelled
+      </span>
+    {% endif %}
+  </div>
+
+
+  <!-- TRANSACTION SUMMARY -->
+
+  <div class="details-layout">
+
+    <article class="detail-card">
+
+      <div class="card-title">
+
+        <div>
+          <p>Transaction number</p>
+
+          <h2>
+            {{ transaction.tracking_id }}
+          </h2>
+        </div>
+
+        <span class="badge">
+          {{ transaction.ebqs_number }}
+        </span>
+
+      </div>
+
+
+      <!-- CURRENT STATUS -->
+
+      <div class="status-highlight">
+
+        <p>Current stage</p>
+
+        <h2>
+          {{ transaction.current_stage|title }}
+        </h2>
+
+        {% if transaction.status == "active" %}
+          <small>
+            Your transaction is currently being processed.
+          </small>
+
+        {% elif transaction.status == "completed" %}
+          <small>
+            Your transaction has been completed.
+          </small>
+
+        {% elif transaction.status == "cancelled" %}
+          <small>
+            This transaction has been cancelled.
+          </small>
+        {% endif %}
+
+      </div>
+
+
+      <!-- DETAILS -->
+
+      <dl class="summary-grid">
+
+        <div>
+          <dt>Transaction category</dt>
+          <dd>
+            {{ transaction.category }}
+          </dd>
+        </div>
+
+
+        <div>
+          <dt>Requirements</dt>
+          <dd>
+            {{ transaction.get_requirements_status_display }}
+          </dd>
+        </div>
+
+
+        <div>
+          <dt>Priority</dt>
+          <dd>
+            {{ transaction.get_priority_category_display }}
+          </dd>
+        </div>
+
+
+        <div>
+          <dt>Received</dt>
+          <dd>
+            {{ transaction.received_at|date:"F d, Y h:i A" }}
+          </dd>
+        </div>
+
+
+        <div>
+          <dt>Tracking threshold</dt>
+          <dd>
+            {{ transaction.threshold_minutes }} minutes
+          </dd>
+        </div>
+
+
+        {% if transaction.accepted_at %}
+          <div>
+            <dt>Accepted</dt>
+            <dd>
+              {{ transaction.accepted_at|date:"F d, Y h:i A" }}
+            </dd>
+          </div>
+        {% endif %}
+
+
+        {% if transaction.completed_at %}
+          <div>
+            <dt>Completed</dt>
+            <dd>
+              {{ transaction.completed_at|date:"F d, Y h:i A" }}
+            </dd>
+          </div>
+        {% endif %}
+
+      </dl>
+
+
+      <!-- TIMELINE -->
+
+      <div class="timeline">
+
+        <h3 style="margin-bottom:20px;">
+          Transaction progress
+        </h3>
+
+
+        {% for event in transaction.events.all %}
+
+          <div class="
+            {% if event.event_type == 'completed' %}
+              complete
+            {% elif forloop.last %}
+              active
+            {% endif %}
+          ">
+
+            <span></span>
+
+            <div>
+
+              <strong>
+                {{ event.stage|title }}
+              </strong>
+
+              <small>
+                {{ event.occurred_at|date:"F d, Y h:i A" }}
+              </small>
+
+
+              {% if event.remarks %}
+                <small>
+                  {{ event.remarks }}
+                </small>
+              {% endif %}
+
+            </div>
+
+          </div>
+
+        {% empty %}
+
+          <div class="active">
+
+            <span></span>
+
+            <div>
+
+              <strong>
+                Transaction registered
+              </strong>
+
+              <small>
+                Your transaction has been registered.
+              </small>
+
+            </div>
+
+          </div>
+
+        {% endfor %}
+
+      </div>
+
+    </article>
+
+
+    <!-- SIDE INFORMATION -->
+
+    <aside class="requirements-stack">
+
+
+      <!-- TRACKING NUMBER -->
+
+      <section class="requirement-card">
+
+        <h2>
+          Transaction number
+        </h2>
+
+        <div style="text-align:center; padding:20px;">
+
+          <p>
+            Use this number when communicating with
+            E-Center staff about your transaction.
+          </p>
+
+          <strong
+            style="
+              display:block;
+              font-size:1.25rem;
+              letter-spacing:0.08em;
+              margin-top:15px;
+            "
+          >
+            {{ transaction.tracking_id }}
+          </strong>
+
+        </div>
+
+      </section>
+
+
+      <!-- PASSKEY -->
+
+      <section class="requirement-card">
+
+        <h2>
+          Transaction passkey
+        </h2>
+
+        <div style="text-align:center; padding:20px;">
+
+          <p>
+            You can use your passkey to access
+            your transaction status again.
+          </p>
+
+          <strong
+            style="
+              display:block;
+              font-size:1.5rem;
+              letter-spacing:0.15em;
+              margin-top:15px;
+            "
+          >
+            {{ transaction.passkey }}
+          </strong>
+
+        </div>
+
+      </section>
+
+
+      <!-- FINAL RESULT -->
+
+      {% if transaction.final_label %}
+
+        <section
+          class="requirement-card
+          {% if transaction.final_label == 'delayed' %}
+            danger
+          {% else %}
+            good
+          {% endif %}
+          "
+        >
+
+          <h2>
+
+            {% if transaction.final_label == "delayed" %}
+              <span>!</span>
+            {% else %}
+              <span>✓</span>
+            {% endif %}
+
+            Final result
+
+          </h2>
+
+
+          <p>
+            {{ transaction.get_final_label_display }}
+          </p>
+
+
+          {% if transaction.adjusted_duration_minutes != None %}
+
+            <small>
+              Processing time:
+              {{ transaction.adjusted_duration_minutes }}
+              minutes
+            </small>
+
+          {% endif %}
+
+        </section>
+
+      {% endif %}
+
+
+    </aside>
+
+  </div>
+
+
+  <!-- ACTIONS -->
+
+  <div class="action-bar">
+
+    <a
+      class="button button-secondary"
+      href="{% url 'home' %}"
+    >
+      Back to home
+    </a>
+
+    <a
+      class="button button-primary"
+      href="{% url 'passkey' %}"
+    >
+      Use another passkey
+    </a>
+
+  </div>
+
+</section>
+
+{% endblock %}
+```
