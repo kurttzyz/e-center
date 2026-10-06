@@ -15,12 +15,19 @@ from django.utils import timezone
 from .models import ServiceCategory
 from .forms import CompletionForm, EventForm, TransactionForm
 from .models import Transaction, TransactionEvent
+from .models import Service
 
 @login_required
 def dashboard(request):
     query=request.GET.get("q","").strip()
     rows=Transaction.objects.all()
-    if query: rows=rows.filter(Q(ebqs_number__icontains=query)|Q(category__icontains=query)|Q(current_stage__icontains=query))
+    if query:
+        rows = rows.filter(
+            Q(ebqs_number__icontains=query)
+            | Q(service__name__icontains=query)
+            | Q(service__category__name__icontains=query)
+            | Q(current_stage__icontains=query)
+        )
     counts=Transaction.objects.aggregate(total=Count("id"),active=Count("id",filter=Q(status="active")),completed=Count("id",filter=Q(status="completed")),delayed=Count("id",filter=Q(final_label="delayed")))
     return render(request,"collector/dashboard.html",{"transactions":rows[:200],"counts":counts,"query":query})
 
@@ -68,18 +75,58 @@ def complete_transaction(request,pk):
 
 @login_required
 def export_csv(request):
-    response=HttpResponse(content_type="text/csv");response["Content-Disposition"]='attachment; filename="ecenter-training-data.csv"'
-    writer=csv.writer(response);writer.writerow(["research_id","ebqs_number","category","requirements_status","priority_category","received_at","accepted_at","threshold_minutes","status","completed_at","adjusted_duration_minutes","final_label","notes"])
-    for x in Transaction.objects.order_by("received_at"): writer.writerow([x.pk,x.ebqs_number,x.category,x.requirements_status,x.priority_category,x.received_at,x.accepted_at,x.threshold_minutes,x.status,x.completed_at,x.adjusted_duration_minutes,x.final_label,x.notes])
+    response = HttpResponse(content_type="text/csv")
+
+    response["Content-Disposition"] = (
+        'attachment; filename="ecenter-training-data.csv"'
+    )
+
+    writer = csv.writer(response)
+
+    writer.writerow([
+        "research_id",
+        "ebqs_number",
+        "service",
+        "service_category",
+        "requirements_status",
+        "priority_category",
+        "received_at",
+        "accepted_at",
+        "threshold_minutes",
+        "status",
+        "completed_at",
+        "adjusted_duration_minutes",
+        "final_label",
+        "notes",
+    ])
+
+    for x in Transaction.objects.select_related(
+        "service",
+        "service__category",
+    ).order_by("received_at"):
+
+        writer.writerow([
+            x.pk,
+            x.ebqs_number,
+            x.service.name if x.service else "",
+            x.service.category.name if x.service else "",
+            x.requirements_status,
+            x.priority_category,
+            x.received_at,
+            x.accepted_at,
+            x.threshold_minutes,
+            x.status,
+            x.completed_at,
+            x.adjusted_duration_minutes,
+            x.final_label,
+            x.notes,
+        ])
+
     return response
 
 # WEBSITE 
 
-SERVICES = [
-    {"group": "Services", "icon": "briefcase", "items": ["Disbursement Account", "My.SSS Card"]},
-    {"group": "Benefits", "icon": "heart", "items": ["Maternity", "Sickness", "Disability", "Retirement", "Unemployment", "Funeral", "Death"]},
-    {"group": "Loans", "icon": "wallet", "items": ["Pension Loan", "Emergency/Calamity Loan", "Penalty Loan Condonation"]},
-]
+
 
 
 def home(request):
@@ -157,18 +204,55 @@ def transaction_status(request, tracking_id):
             "transaction": item,
         }
     )
-
 def transaction(request):
-    # if request.method == "POST":
-    #     tracking_id = f"ECT-{uuid4().hex[:10].upper()}"
-    #     request.session["tracking_id"] = tracking_id
-    #     request.session["transaction_type"] = request.POST.get("transaction_type", "E-Center Assistance")
-    #     return redirect("qr_result")
-    return render(request, "portal/transaction.html", {
-        # "member": {"reference": "•••••••678", "name": "Sample Member"},
-        # "submitted": ["Valid government-issued ID", "Member information form"],
-        # "lacking": ["Validated deposit slip with visible name and account number"],
-    })
+    service_code = request.GET.get("service")
+
+    if not service_code:
+        return redirect("services")
+
+    service = get_object_or_404(
+        Service,
+        code=service_code,
+        is_active=True,
+    )
+
+    requirements = service.requirements.filter(
+        is_active=True
+    ).order_by("display_order")
+
+    return render(
+        request,
+        "portal/transaction.html",
+        {
+            "service": service,
+            "requirements": requirements,
+        },
+    )
+
+def requirements(request):
+    service_code = request.GET.get("service")
+
+    if not service_code:
+        return redirect("services")
+
+    service = get_object_or_404(
+        Service,
+        code=service_code,
+        is_active=True,
+    )
+
+    requirements = service.requirements.filter(
+        is_active=True
+    ).order_by("display_order")
+
+    return render(
+        request,
+        "portal/requirements.html",
+        {
+            "service": service,
+            "requirements": requirements,
+        },
+    )
 
 
 # def qr_result(request):

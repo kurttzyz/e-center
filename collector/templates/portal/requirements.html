@@ -1,0 +1,579 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ service.name }} | E-Center Assist
+{% endblock %}
+
+{% block content %}
+
+<section class="requirements-page shell">
+
+  {% include 'portal/_steps.html' with step=2 has_transaction=False %}
+
+  <!-- PAGE HEADER -->
+  <header class="requirements-hero">
+
+    <div class="requirements-hero-content">
+      <span class="eyebrow">Service Requirements</span>
+
+      <h1>{{ service.name }}</h1>
+
+      {% if service.description %}
+        <p>{{ service.description }}</p>
+      {% else %}
+        <p>
+          Review the requirements below before visiting
+          or proceeding with this service.
+        </p>
+      {% endif %}
+    </div>
+
+    <a
+      href="{% url 'services' %}"
+      class="button button-secondary back-button"
+    >
+      <span aria-hidden="true">←</span>
+      Back to services
+    </a>
+
+  </header>
+
+
+  <!-- INSTRUCTIONS -->
+  {% if service.instructions %}
+
+    <div class="info-card">
+      <div class="info-icon" aria-hidden="true">i</div>
+
+      <div>
+        <strong>Before you proceed</strong>
+        <p>{{ service.instructions }}</p>
+      </div>
+    </div>
+
+  {% endif %}
+
+
+  <!-- REQUIREMENTS -->
+  <section class="requirements-card">
+
+    <div class="requirements-card-header">
+
+      <div>
+        <span class="section-label">Checklist</span>
+        <h2>What you need</h2>
+
+        <p>
+          Prepare the following information or documents
+          for this service.
+        </p>
+      </div>
+
+      {% if requirements %}
+        <div class="requirement-count">
+          {{ requirements|length }}
+          <span>
+            requirement{{ requirements|length|pluralize }}
+          </span>
+        </div>
+      {% endif %}
+
+    </div>
+
+
+    <div class="requirements-list">
+
+      {% for requirement in requirements %}
+
+        <article class="requirement-item">
+
+          <div class="requirement-check" aria-hidden="true">
+            ✓
+          </div>
+
+          <div class="requirement-content">
+
+            <div class="requirement-heading">
+
+              <h3>{{ requirement.name }}</h3>
+
+              {% if requirement.is_required %}
+                <span class="requirement-badge required-badge">
+                  Required
+                </span>
+              {% else %}
+                <span class="requirement-badge optional-badge">
+                  If applicable
+                </span>
+              {% endif %}
+
+            </div>
+
+            <span class="requirement-type">
+              {{ requirement.get_requirement_type_display }}
+            </span>
+
+            {% if requirement.description %}
+              <p>{{ requirement.description }}</p>
+            {% endif %}
+
+          </div>
+
+        </article>
+
+      {% empty %}
+
+        <div class="requirements-empty">
+          <div class="empty-icon" aria-hidden="true">i</div>
+
+          <div>
+            <strong>No specific requirements listed</strong>
+            <p>
+              No requirements have been configured for
+              this service yet. Please ask E-Center staff
+              for assistance.
+            </p>
+          </div>
+        </div>
+
+      {% endfor %}
+
+    </div>
+
+  </section>
+
+
+  <!-- FOOTER ACTION -->
+  <div class="requirements-footer">
+
+    <div>
+      <strong>Looking for another service?</strong>
+      <p>
+        Return to the service list to check the
+        requirements for another service.
+      </p>
+    </div>
+
+    <a
+      href="{% url 'services' %}"
+      class="button button-secondary"
+    >
+      View all services
+    </a>
+
+  </div>
+
+</section>
+
+<style>
+    /* =========================================================
+   REQUIREMENTS PAGE
+   ========================================================= */
+
+.requirements-page {
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+}
+
+
+/* Header */
+
+.requirements-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 2rem;
+
+    margin-top: 2rem;
+    margin-bottom: 1.75rem;
+}
+
+.requirements-hero-content {
+    max-width: 760px;
+}
+
+.requirements-hero h1 {
+    margin: 0.4rem 0 0.75rem;
+
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+}
+
+.requirements-hero p {
+    max-width: 700px;
+    margin: 0;
+
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--text-muted, #667085);
+}
+
+.eyebrow,
+.section-label {
+    display: inline-block;
+
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.back-button {
+    flex-shrink: 0;
+}
+
+
+/* Information / instructions */
+
+.info-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+
+    padding: 1.1rem 1.25rem;
+    margin-bottom: 1.5rem;
+
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 14px;
+}
+
+.info-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+
+    border: 1px solid currentColor;
+    border-radius: 50%;
+
+    font-weight: 700;
+}
+
+.info-card strong {
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.info-card p {
+    margin: 0;
+    line-height: 1.6;
+    color: var(--text-muted, #667085);
+}
+
+
+/* Main card */
+
+.requirements-card {
+    overflow: hidden;
+
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 18px;
+}
+
+.requirements-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+
+    padding: 1.5rem 1.75rem;
+
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.requirements-card-header h2 {
+    margin: 0.25rem 0;
+    font-size: 1.5rem;
+}
+
+.requirements-card-header p {
+    margin: 0;
+    color: var(--text-muted, #667085);
+    line-height: 1.6;
+}
+
+
+/* Requirement counter */
+
+.requirement-count {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 80px;
+    padding: 0.7rem 1rem;
+
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+
+    font-size: 1.35rem;
+    font-weight: 700;
+}
+
+.requirement-count span {
+    margin-top: 0.1rem;
+
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+
+/* Requirement list */
+
+.requirements-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.requirement-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+
+    padding: 1.4rem 1.75rem;
+
+    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.requirement-item:last-child {
+    border-bottom: 0;
+}
+
+.requirement-check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+
+    border: 1px solid currentColor;
+    border-radius: 50%;
+
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.requirement-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.requirement-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.requirement-heading h3 {
+    margin: 0;
+
+    font-size: 1rem;
+    line-height: 1.4;
+}
+
+.requirement-type {
+    display: block;
+
+    margin-top: 0.25rem;
+
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted, #667085);
+}
+
+.requirement-content p {
+    max-width: 750px;
+
+    margin: 0.6rem 0 0;
+
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--text-muted, #667085);
+}
+
+
+/* Badges */
+
+.requirement-badge {
+    display: inline-flex;
+    align-items: center;
+
+    flex-shrink: 0;
+
+    padding: 0.3rem 0.6rem;
+
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 999px;
+
+    font-size: 0.7rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+
+/* Empty state */
+
+.requirements-empty {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+
+    padding: 2rem 1.75rem;
+}
+
+.empty-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+
+    border: 1px solid currentColor;
+    border-radius: 50%;
+
+    font-weight: 700;
+}
+
+.requirements-empty p {
+    margin: 0.4rem 0 0;
+    color: var(--text-muted, #667085);
+}
+
+
+/* Bottom action */
+
+.requirements-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+
+    margin-top: 1.5rem;
+    padding: 1.25rem 1.5rem;
+
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 14px;
+}
+
+.requirements-footer strong {
+    display: block;
+}
+
+.requirements-footer p {
+    margin: 0.25rem 0 0;
+
+    font-size: 0.9rem;
+    color: var(--text-muted, #667085);
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    .requirements-page {
+        padding-top: 1rem;
+        padding-bottom: 2.5rem;
+    }
+
+    .requirements-hero {
+        flex-direction: column;
+        gap: 1.25rem;
+
+        margin-top: 1.25rem;
+    }
+
+    .requirements-hero h1 {
+        font-size: clamp(1.8rem, 8vw, 2.4rem);
+    }
+
+    .back-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .requirements-card {
+        border-radius: 14px;
+    }
+
+    .requirements-card-header {
+        align-items: flex-start;
+
+        padding: 1.25rem;
+    }
+
+    .requirement-count {
+        min-width: 65px;
+    }
+
+    .requirement-item {
+        padding: 1.25rem;
+    }
+
+    .requirement-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .requirements-footer {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .requirements-footer .button {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+}
+
+
+/* Small phones */
+
+@media (max-width: 480px) {
+
+    .requirements-card-header {
+        flex-direction: column;
+    }
+
+    .requirement-count {
+        flex-direction: row;
+        gap: 0.35rem;
+
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .requirement-item {
+        gap: 0.75rem;
+    }
+
+    .requirement-check {
+        width: 30px;
+        height: 30px;
+        flex-basis: 30px;
+    }
+
+    .info-card {
+        padding: 1rem;
+    }
+}
+</style>
+
+{% endblock %}

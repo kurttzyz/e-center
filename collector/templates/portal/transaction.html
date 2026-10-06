@@ -222,12 +222,42 @@
   Register another transaction
 </a>
 
-<a
+{% comment %} <a
   class="button button-primary"
   href="{% url 'transaction_detail' pk=transaction.pk %}"
 >
   View transaction record
-</a>
+</a> {% endcomment %}
+<div class="assist-strip">
+
+  <div>
+    <strong>Do you have the requirements?</strong>
+
+    <p>
+      Continue when you are ready to begin this
+      E-Center transaction.
+    </p>
+  </div>
+
+  <div>
+
+    <a
+      class="button button-secondary"
+      href="{% url 'services' %}"
+    >
+      Not yet
+    </a>
+
+    <button
+      class="button"
+      type="button"
+    >
+      Yes, continue
+    </button>
+
+  </div>
+
+</div>
 ```
 
   </div>

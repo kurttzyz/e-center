@@ -1,7 +1,54 @@
-<ol class="steps" aria-label="Transaction progress">
-  <li class="{% if step >= 1 %}done{% endif %}"><span>1</span>Choose service</li>
-  <li class="{% if step >= 2 %}done{% endif %}"><span>2</span>Find record</li>
-  <li class="{% if step >= 3 %}done{% endif %}"><span>3</span>Review details</li>
-  <li class="{% if step >= 4 %}done{% endif %}"><span>4</span>Get tracking QR</li>
-</ol>
+<ol class="steps" aria-label="E-Center progress">
 
+  <!-- STEP 1 -->
+  <li class="
+    {% if step == 1 %}active
+    {% elif step > 1 %}done
+    {% endif %}
+  ">
+    {% if step > 1 and not has_transaction %}
+      <a href="{% url 'services' %}">
+        <span>1</span>
+        Choose service
+      </a>
+    {% else %}
+      <span>1</span>
+      Choose service
+    {% endif %}
+  </li>
+
+
+  <!-- STEP 2 -->
+  <li class="
+    {% if step == 2 %}active
+    {% elif step > 2 %}done
+    {% endif %}
+  ">
+    <span>2</span>
+    View requirements
+  </li>
+
+
+  <!-- STEP 3 -->
+  <li class="
+    {% if not has_transaction %}disabled
+    {% elif step == 3 %}active
+    {% elif step > 3 %}done
+    {% endif %}
+  ">
+    <span>3</span>
+    Transaction status
+  </li>
+
+
+  <!-- STEP 4 -->
+  <li class="
+    {% if not has_transaction %}disabled
+    {% elif step == 4 %}active
+    {% endif %}
+  ">
+    <span>4</span>
+    Tracking QR
+  </li>
+
+</ol>

@@ -13,13 +13,19 @@ Choose a service | E-Center Assist
   <div class="page-heading">
     <div>
       <span class="eyebrow">Step 1 of 4</span>
+
       <h1>What do you need help with?</h1>
+
       <p>
-        Select one service to view its requirements and begin assistance.
+        Select one service to view its requirements
+        and begin assistance.
       </p>
     </div>
 
-    <a class="button button-secondary" href="{% url 'scan' %}">
+    <a
+      class="button button-secondary"
+      href="{% url 'scan' %}"
+    >
       I already have a QR
     </a>
   </div>
@@ -58,7 +64,7 @@ Choose a service | E-Center Assist
             {% if service.is_active %}
 
               <li>
-                <a href="{% url 'transaction' %}?service={{ service.code }}">
+                <a href="{% url 'requirements' %}?service={{ service.code }}">
                   <span>{{ service.name }}</span>
                   <b>→</b>
                 </a>
@@ -68,7 +74,9 @@ Choose a service | E-Center Assist
 
           {% empty %}
 
-            <li>No services available.</li>
+            <li>
+              No services available in this category.
+            </li>
 
           {% endfor %}
 
@@ -79,7 +87,9 @@ Choose a service | E-Center Assist
     {% empty %}
 
       <div class="empty-state">
-        <p>No E-Center services are currently available.</p>
+        <p>
+          No E-Center services are currently available.
+        </p>
       </div>
 
     {% endfor %}
@@ -90,10 +100,11 @@ Choose a service | E-Center Assist
   <div class="assist-strip">
 
     <div>
-      <strong>I don't understand the choices</strong>
+      <strong>Not sure which service to choose?</strong>
+
       <p>
-        A staff member can explain each category without making
-        the decision for you.
+        A staff member can help explain the available
+        E-Center services.
       </p>
     </div>
 
