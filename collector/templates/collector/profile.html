@@ -1,0 +1,1011 @@
+{% extends 'collector/base.html' %}
+
+{% block title %}
+My Account | SSSential
+{% endblock %}
+
+{% block content %}
+
+<div class="profile-page">
+
+  <!-- =========================================
+       PAGE HEADER
+       ========================================= -->
+
+  <section class="profile-page-header">
+
+    <div>
+      <span class="profile-eyebrow">SSSential Account</span>
+
+      <h1>My Account</h1>
+
+      <p>
+        View your employee information and SSSential system access.
+      </p>
+    </div>
+
+  </section>
+
+
+  <!-- =========================================
+       PROFILE LAYOUT
+       ========================================= -->
+
+  <div class="profile-layout">
+
+
+    <!-- =========================================
+         LEFT PROFILE CARD
+         ========================================= -->
+
+    <aside class="profile-summary-card">
+
+      <div class="profile-cover"></div>
+
+      <div class="profile-summary-content">
+
+        <!-- Initials / Avatar -->
+
+        <div class="profile-avatar">
+          {% if user.first_name %}
+            {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+          {% else %}
+            {{ user.username|first|upper }}
+          {% endif %}
+        </div>
+
+
+        <!-- Identity -->
+
+        <div class="profile-identity">
+
+          <h2>
+            {% if user.get_full_name %}
+              {{ user.get_full_name }}
+            {% else %}
+              {{ user.username }}
+            {% endif %}
+          </h2>
+
+          <p class="profile-position">
+            {{ user.profile.position|default:"OJT / Employee" }}
+          </p>
+
+          <span class="profile-status">
+            <span></span>
+            Active Account
+          </span>
+
+        </div>
+
+
+        <!-- Summary Information -->
+
+        <div class="profile-summary-info">
+
+          <div class="summary-item">
+
+            <span class="summary-label">
+              Role
+            </span>
+
+            <strong>
+              {{ user.profile.role|default:"Employee" }}
+            </strong>
+
+          </div>
+
+
+          <div class="summary-item">
+
+            <span class="summary-label">
+              Office / Unit
+            </span>
+
+            <strong>
+              {{ user.profile.office|default:"E-Center" }}
+            </strong>
+
+          </div>
+
+
+          <div class="summary-item">
+
+            <span class="summary-label">
+              Account Type
+            </span>
+
+            <strong>
+              {{ user.profile.employee_type|default:"OJT / Employee" }}
+            </strong>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </aside>
+
+
+    <!-- =========================================
+         RIGHT CONTENT
+         ========================================= -->
+
+    <div class="profile-content">
+
+
+      <!-- =========================================
+           EMPLOYEE INFORMATION
+           ========================================= -->
+
+      <section class="profile-panel">
+
+        <div class="profile-panel-header">
+
+          <div>
+            <h2>Employee Information</h2>
+
+            <p>
+              Basic information associated with your SSSential account.
+            </p>
+          </div>
+
+          <span class="profile-section-badge">
+            Employee
+          </span>
+
+        </div>
+
+
+        <div class="profile-info-grid">
+
+
+          <!-- FULL NAME -->
+
+          <div class="profile-field">
+
+            <span class="profile-field-label">
+              Full Name
+            </span>
+
+            <strong>
+              {% if user.get_full_name %}
+                {{ user.get_full_name }}
+              {% else %}
+                —
+              {% endif %}
+            </strong>
+
+          </div>
+
+
+          <!-- POSITION -->
+
+          <div class="profile-field">
+
+            <span class="profile-field-label">
+              Position
+            </span>
+
+            <strong>
+              {{ user.profile.position|default:"OJT / Employee" }}
+            </strong>
+
+          </div>
+
+
+          <!-- OFFICE -->
+
+          <div class="profile-field">
+
+            <span class="profile-field-label">
+              Assigned Office
+            </span>
+
+            <strong>
+              {{ user.profile.office|default:"E-Center" }}
+            </strong>
+
+          </div>
+
+
+          <!-- EMPLOYEE TYPE -->
+
+          <div class="profile-field">
+
+            <span class="profile-field-label">
+              Employment Type
+            </span>
+
+            <strong>
+              {{ user.profile.employee_type|default:"OJT / Employee" }}
+            </strong>
+
+          </div>
+
+
+          <!-- ROLE -->
+
+          <div class="profile-field">
+
+            <span class="profile-field-label">
+              System Role
+            </span>
+
+            <strong>
+              {{ user.profile.role|default:"Employee" }}
+            </strong>
+
+          </div>
+
+
+          <!-- STATUS -->
+
+          <div class="profile-field">
+
+            <span class="profile-field-label">
+              Account Status
+            </span>
+
+            {% if user.is_active %}
+
+              <span class="account-status active">
+                <span></span>
+                Active
+              </span>
+
+            {% else %}
+
+              <span class="account-status inactive">
+                <span></span>
+                Inactive
+              </span>
+
+            {% endif %}
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================================
+           ACCOUNT INFORMATION
+           ========================================= -->
+
+      <section class="profile-panel">
+
+        <div class="profile-panel-header">
+
+          <div>
+            <h2>Account Information</h2>
+
+            <p>
+              Login and account details used in SSSential.
+            </p>
+          </div>
+
+        </div>
+
+
+        <div class="profile-info-grid">
+
+
+          <!-- USERNAME -->
+
+          <div class="profile-field">
+
+            <span class="profile-field-label">
+              Username
+            </span>
+
+            <strong>
+              {{ user.username }}
+            </strong>
+
+          </div>
+
+
+          <!-- EMAIL -->
+
+          <div class="profile-field">
+
+            <span class="profile-field-label">
+              Email Address
+            </span>
+
+            <strong>
+              {{ user.email|default:"Not provided" }}
+            </strong>
+
+          </div>
+
+
+          <!-- DATE JOINED -->
+
+          <div class="profile-field">
+
+            <span class="profile-field-label">
+              Account Created
+            </span>
+
+            <strong>
+              {{ user.date_joined|date:"M d, Y" }}
+            </strong>
+
+          </div>
+
+
+          <!-- LAST LOGIN -->
+
+          <div class="profile-field">
+
+            <span class="profile-field-label">
+              Last Login
+            </span>
+
+            <strong>
+              {% if user.last_login %}
+                {{ user.last_login|date:"M d, Y · g:i A" }}
+              {% else %}
+                No previous login
+              {% endif %}
+            </strong>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================================
+           ACCESS INFORMATION
+           ========================================= -->
+
+      <section class="profile-panel access-panel">
+
+        <div class="profile-panel-header">
+
+          <div>
+            <h2>System Access</h2>
+
+            <p>
+              Features available to your assigned account role.
+            </p>
+          </div>
+
+        </div>
+
+
+        <div class="access-grid">
+
+          <div class="access-item allowed">
+
+            <div class="access-check">✓</div>
+
+            <div>
+              <strong>Register Transactions</strong>
+              <span>Create E-Center monitoring records.</span>
+            </div>
+
+          </div>
+
+
+          <div class="access-item allowed">
+
+            <div class="access-check">✓</div>
+
+            <div>
+              <strong>View Transactions</strong>
+              <span>Monitor registered transaction progress.</span>
+            </div>
+
+          </div>
+
+
+          <div class="access-item allowed">
+
+            <div class="access-check">✓</div>
+
+            <div>
+              <strong>Update Transaction Status</strong>
+              <span>Record transaction workflow updates.</span>
+            </div>
+
+          </div>
+
+
+          <div class="access-item restricted">
+
+            <div class="access-check">—</div>
+
+            <div>
+              <strong>Administrative Settings</strong>
+              <span>Restricted to authorized administrators.</span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<style>
+
+/* =========================================================
+   PROFILE PAGE
+   ========================================================= */
+
+.profile-page {
+  width: 100%;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.profile-page-header {
+  margin-bottom: 24px;
+}
+
+.profile-eyebrow {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: var(--sss-blue);
+
+  font-family:
+    Montserrat,
+    Aptos,
+    sans-serif;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+}
+
+.profile-page-header h1 {
+  margin: 0 0 6px;
+
+  color: var(--sss-primary);
+
+  font-family:
+    Montserrat,
+    Aptos,
+    sans-serif;
+
+  font-size: 28px;
+  font-weight: 700;
+
+  letter-spacing: -0.5px;
+}
+
+.profile-page-header p {
+  margin: 0;
+
+  color: var(--muted);
+
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   PROFILE LAYOUT
+   ========================================================= */
+
+.profile-layout {
+  display: grid;
+
+  grid-template-columns:
+    280px
+    minmax(0, 1fr);
+
+  gap: 20px;
+
+  align-items: start;
+}
+
+
+/* =========================================================
+   SUMMARY CARD
+   ========================================================= */
+
+.profile-summary-card {
+  overflow: hidden;
+
+  background: #fff;
+
+  border: 1px solid var(--line);
+  border-radius: 12px;
+
+  box-shadow:
+    0 4px 18px rgba(43, 79, 155, 0.06);
+}
+
+.profile-cover {
+  height: 82px;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--sss-primary),
+      var(--sss-blue)
+    );
+}
+
+.profile-summary-content {
+  padding: 0 22px 22px;
+}
+
+
+/* =========================================================
+   AVATAR
+   ========================================================= */
+
+.profile-avatar {
+  width: 72px;
+  height: 72px;
+
+  display: grid;
+  place-items: center;
+
+  margin-top: -36px;
+  margin-bottom: 14px;
+
+  background: #fff;
+
+  border: 4px solid #fff;
+  border-radius: 50%;
+
+  box-shadow:
+    0 3px 12px rgba(43, 79, 155, 0.14);
+
+  color: var(--sss-primary);
+
+  font-family:
+    Montserrat,
+    Aptos,
+    sans-serif;
+
+  font-size: 22px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   IDENTITY
+   ========================================================= */
+
+.profile-identity {
+  padding-bottom: 20px;
+
+  border-bottom: 1px solid var(--line);
+}
+
+.profile-identity h2 {
+  margin: 0 0 4px;
+
+  color: var(--sss-primary);
+
+  font-family:
+    Montserrat,
+    Aptos,
+    sans-serif;
+
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.profile-position {
+  margin: 0 0 11px;
+
+  color: var(--muted);
+
+  font-size: 13px;
+}
+
+.profile-status {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 4px 8px;
+
+  background: #e8f5ef;
+
+  border: 1px solid #c8e7d9;
+  border-radius: 999px;
+
+  color: #31745b;
+
+  font-size: 10.5px;
+  font-weight: 650;
+}
+
+.profile-status > span {
+  width: 6px;
+  height: 6px;
+
+  background: #4b9878;
+
+  border-radius: 50%;
+}
+
+
+/* =========================================================
+   SUMMARY INFO
+   ========================================================= */
+
+.profile-summary-info {
+  padding-top: 18px;
+}
+
+.summary-item {
+  margin-bottom: 15px;
+}
+
+.summary-item:last-child {
+  margin-bottom: 0;
+}
+
+.summary-label {
+  display: block;
+
+  margin-bottom: 2px;
+
+  color: var(--muted);
+
+  font-size: 10.5px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.04em;
+}
+
+.summary-item strong {
+  display: block;
+
+  color: #344054;
+
+  font-size: 12.5px;
+  font-weight: 650;
+}
+
+
+/* =========================================================
+   RIGHT CONTENT
+   ========================================================= */
+
+.profile-content {
+  display: flex;
+  flex-direction: column;
+
+  gap: 18px;
+
+  min-width: 0;
+}
+
+
+/* =========================================================
+   PANEL
+   ========================================================= */
+
+.profile-panel {
+  overflow: hidden;
+
+  background: #fff;
+
+  border: 1px solid var(--line);
+  border-radius: 12px;
+
+  box-shadow:
+    0 3px 14px rgba(43, 79, 155, 0.045);
+}
+
+
+/* =========================================================
+   PANEL HEADER
+   ========================================================= */
+
+.profile-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 18px 22px;
+
+  background: #fafbfd;
+
+  border-bottom: 1px solid var(--line);
+}
+
+.profile-panel-header h2 {
+  margin: 0 0 3px;
+
+  color: var(--sss-primary);
+
+  font-family:
+    Montserrat,
+    Aptos,
+    sans-serif;
+
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.profile-panel-header p {
+  margin: 0;
+
+  color: var(--muted);
+
+  font-size: 11.5px;
+}
+
+.profile-section-badge {
+  padding: 4px 9px;
+
+  background: var(--sss-pale-blue);
+
+  border: 1px solid var(--sss-light-blue);
+  border-radius: 999px;
+
+  color: var(--sss-primary);
+
+  font-size: 10px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+}
+
+
+/* =========================================================
+   INFORMATION GRID
+   ========================================================= */
+
+.profile-info-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+}
+
+.profile-field {
+  min-width: 0;
+
+  padding: 18px 22px;
+
+  border-bottom: 1px solid #edf1f5;
+}
+
+.profile-field:nth-child(odd) {
+  border-right: 1px solid #edf1f5;
+}
+
+.profile-info-grid .profile-field:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.profile-field-label {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: var(--muted);
+
+  font-size: 10.5px;
+  font-weight: 600;
+
+  letter-spacing: 0.035em;
+
+  text-transform: uppercase;
+}
+
+.profile-field strong {
+  display: block;
+
+  overflow-wrap: anywhere;
+
+  color: #344054;
+
+  font-size: 13px;
+  font-weight: 650;
+}
+
+
+/* =========================================================
+   ACCOUNT STATUS
+   ========================================================= */
+
+.account-status {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.account-status > span {
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+}
+
+.account-status.active {
+  color: #31745b;
+}
+
+.account-status.active > span {
+  background: #4b9878;
+}
+
+.account-status.inactive {
+  color: var(--sss-red);
+}
+
+.account-status.inactive > span {
+  background: var(--sss-red);
+}
+
+
+/* =========================================================
+   ACCESS GRID
+   ========================================================= */
+
+.access-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 0;
+}
+
+.access-item {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 11px;
+
+  padding: 18px 22px;
+
+  border-bottom: 1px solid #edf1f5;
+}
+
+.access-item:nth-child(odd) {
+  border-right: 1px solid #edf1f5;
+}
+
+.access-item:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.access-check {
+  width: 25px;
+  height: 25px;
+
+  flex-shrink: 0;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.access-item.allowed .access-check {
+  background: #e8f5ef;
+
+  color: #31745b;
+}
+
+.access-item.restricted .access-check {
+  background: #f2f4f7;
+
+  color: #98a2b3;
+}
+
+.access-item strong,
+.access-item span {
+  display: block;
+}
+
+.access-item strong {
+  margin-bottom: 2px;
+
+  color: #344054;
+
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.access-item span {
+  color: var(--muted);
+
+  font-size: 10.5px;
+  line-height: 1.45;
+}
+
+.access-item.restricted {
+  opacity: 0.72;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 850px) {
+
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-summary-card {
+    width: 100%;
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .profile-page-header h1 {
+    font-size: 23px;
+  }
+
+  .profile-info-grid,
+  .access-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-field,
+  .access-item {
+    border-right: 0 !important;
+    border-bottom: 1px solid #edf1f5 !important;
+  }
+
+  .profile-field:last-child,
+  .access-item:last-child {
+    border-bottom: 0 !important;
+  }
+
+  .profile-panel-header {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 8px;
+  }
+
+}
+
+</style>
+
+{% endblock %}

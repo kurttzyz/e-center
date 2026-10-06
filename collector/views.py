@@ -17,6 +17,11 @@ from .forms import CompletionForm, EventForm, TransactionForm
 from .models import Transaction, TransactionEvent
 from .models import Service
 
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+
+
+
 @login_required
 def dashboard(request):
     query=request.GET.get("q","").strip()
@@ -39,7 +44,7 @@ def create_transaction(request):
             item=form.save(False);item.created_by=request.user;item.save()
             TransactionEvent.objects.create(transaction=item,event_type="created",stage="received",occurred_at=item.received_at,remarks="Transaction registered",recorded_by=request.user)
         messages.success(request,"Transaction registered.");return redirect("qr_result",pk=item.pk) #it was transaction_detail vefore
-    return render(request,"collector/form.html",{"form":form,"title":"Register transaction","submit_label":"Save research record"})
+    return render(request,"collector/form.html",{"form":form,"title":"Register transaction","submit_label":"Save and generate QR code"})
 
 @login_required
 def transaction_detail(request,pk):
@@ -61,17 +66,70 @@ def add_event(request,pk):
     return render(request,"collector/form.html",{"form":form,"title":f"Add event · {item.ebqs_number}","submit_label":"Record event"})
 
 @login_required
-def complete_transaction(request,pk):
-    item=get_object_or_404(Transaction,pk=pk,status="active")
-    form=CompletionForm(request.POST or None,initial={"completed_at":timezone.localtime().strftime("%Y-%m-%dT%H:%M")})
-    if request.method=="POST" and form.is_valid():
-        try:
-            with db_transaction.atomic():
-                item.complete(form.cleaned_data["completed_at"])
-                TransactionEvent.objects.create(transaction=item,event_type="completed",stage="completed",occurred_at=item.completed_at,remarks=form.cleaned_data["remarks"],recorded_by=request.user)
-            messages.success(request,f"Transaction labeled {item.get_final_label_display()}.");return redirect("transaction_detail",pk=pk)
-        except ValidationError as exc: form.add_error(None,exc.message)
-    return render(request,"collector/form.html",{"form":form,"title":f"Complete · {item.ebqs_number}","submit_label":"Complete and calculate label"})
+def complete_transaction(request, pk):
+    item = get_object_or_404(Transaction, pk=pk)
+
+    if item.status != "active":
+        messages.warning(
+            request,
+            "This transaction has already been completed."
+        )
+        return redirect("transaction_detail", pk=item.pk)
+
+    form = CompletionForm(request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+
+        completed_at = form.cleaned_data["completed_at"]
+        remarks = form.cleaned_data.get("remarks", "")
+
+        # Validate completion time
+        if completed_at < item.received_at:
+            form.add_error(
+                "completed_at",
+                "Completion time cannot be earlier than the received time."
+            )
+        else:
+            # Complete the transaction
+            item.completed_at = completed_at
+            item.status = "completed"
+            item.current_stage = "completed"
+
+            # Do NOT calculate delayed/on-time here yet.
+            # We currently have no validated delay threshold.
+            item.final_label = None
+
+            item.save()
+
+            # Record completion in event history
+            TransactionEvent.objects.create(
+                transaction=item,
+                stage="completed",
+                occurred_at=completed_at,
+                reason="Transaction completed",
+                remarks=remarks,
+                recorded_by=request.user,
+            )
+
+            messages.success(
+                request,
+                "Transaction completed successfully."
+            )
+
+            return redirect(
+                "transaction_detail",
+                pk=item.pk
+            )
+
+    return render(
+        request,
+        "collector/transaction_complete.html",
+        {
+            "item": item,
+            "form": form,
+        },
+    )
+
 
 @login_required
 def export_csv(request):
@@ -302,3 +360,11 @@ def qr_result(request, pk):
 #     characters = string.ascii_uppercase + string.digits
 #     return "".join(secrets.choice(characters) for _ in range(8))
 
+
+
+@login_required
+def profile(request):
+    return render(
+        request,
+        "collector/profile.html",
+    )

@@ -1,60 +1,1292 @@
-{% extends 'collector/base.html' %}{% block content %}
-<section class="metrics">
-  <article><b>{{ counts.active }}</b><span>Active cases</span></article>
-  <article><b>{{ counts.completed }}</b><span>Completed labels</span></article>
-  <article><b>{{ counts.delayed }}</b><span>Delayed outcomes</span></article>
-</section>
-<section class="panel">
-  <div class="panel-head">
+{% extends 'collector/base.html' %}
+
+{% block title %}
+Employee Dashboard | SSSential
+{% endblock %}
+
+
+{% block content %}
+
+<div class="employee-dashboard">
+
+  <!-- =========================================
+       DASHBOARD HEADER
+       ========================================= -->
+
+  <section class="dashboard-heading">
+
     <div>
-      <h1>Transaction records</h1>
-      <p>{{ counts.total }} anonymized research records</p>
+      <span class="dashboard-eyebrow">
+        SSSential
+      </span>
+
+      <h1>Employee Dashboard</h1>
+
+      <p>
+        Monitor E-Center transactions, review processing status,
+        and manage transaction records.
+      </p>
     </div>
-    <form class="search">
-      <input
-        name="q"
-        value="{{ query }}"
-        placeholder="Search EBQS or category"
-      /><button>Search</button>
-    </form>
-  </div>
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>EBQS / category</th>
-          <th>Current stage</th>
-          <th>Received</th>
-          <th>Threshold</th>
-          <th>Outcome</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in transactions %}
-        <tr>
-          <td>
-            <a href="{% url 'transaction_detail' item.pk %}"
-              ><strong>{{ item.ebqs_number }}</strong></a
-            ><small>{{ item.category }}</small>
-          </td>
-          <td><span class="badge">{{ item.current_stage|title }}</span></td>
-          <td>{{ item.received_at|date:'M d, Y g:i A' }}</td>
-          <td>{% widthratio item.threshold_minutes 60 1 %}h</td>
-          <td>
-            {% if item.final_label %}<span class="badge {{ item.final_label }}"
-              >{{ item.get_final_label_display }}</span
-            >{% else %}<span class="muted">Pending</span>{% endif %}
-          </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="5" class="empty">
-            No records yet. Register the first transaction.
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</section>
+
+    <div class="dashboard-heading-actions">
+
+      <a
+        href="{% url 'transaction_create' %}"
+        class="dashboard-primary-action"
+      >
+        <span class="action-plus">+</span>
+        Register Transaction
+      </a>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================================
+       METRICS
+       ========================================= -->
+
+  <section class="dashboard-metrics">
+
+    <!-- ACTIVE -->
+    <article class="dashboard-metric">
+
+      <div class="metric-top">
+
+        <span class="metric-label">
+          Active Cases
+        </span>
+
+        <span class="metric-status-dot active"></span>
+
+      </div>
+
+      <div class="metric-value">
+        {{ counts.active }}
+      </div>
+
+      <div class="metric-footer">
+        Currently being processed
+      </div>
+
+    </article>
+
+
+    <!-- COMPLETED -->
+    <article class="dashboard-metric">
+
+      <div class="metric-top">
+
+        <span class="metric-label">
+          Completed
+        </span>
+
+        <span class="metric-status-dot completed"></span>
+
+      </div>
+
+      <div class="metric-value">
+        {{ counts.completed }}
+      </div>
+
+      <div class="metric-footer">
+        Transactions with final labels
+      </div>
+
+    </article>
+
+
+    <!-- DELAYED -->
+    <article class="dashboard-metric">
+
+      <div class="metric-top">
+
+        <span class="metric-label">
+          Delayed
+        </span>
+
+        <span class="metric-status-dot delayed"></span>
+
+      </div>
+
+      <div class="metric-value">
+        {{ counts.delayed }}
+      </div>
+
+      <div class="metric-footer">
+        Transactions exceeding threshold
+      </div>
+
+    </article>
+
+
+    <!-- TOTAL -->
+    <article class="dashboard-metric total">
+
+      <div class="metric-top">
+
+        <span class="metric-label">
+          Total Records
+        </span>
+
+        <span class="metric-status-dot total"></span>
+
+      </div>
+
+      <div class="metric-value">
+        {{ counts.total }}
+      </div>
+
+      <div class="metric-footer">
+        Anonymized research records
+      </div>
+
+    </article>
+
+  </section>
+
+
+  <!-- =========================================
+       TRANSACTION RECORDS
+       ========================================= -->
+
+  <section class="records-panel">
+
+    <!-- PANEL HEADER -->
+
+    <div class="records-header">
+
+      <div class="records-title">
+
+        <h2>
+          Transaction Records
+        </h2>
+
+        <p>
+          View and monitor registered E-Center transactions.
+        </p>
+
+      </div>
+
+
+      <!-- SEARCH -->
+
+      <form
+        class="dashboard-search"
+        method="get"
+      >
+
+        <div class="dashboard-search-field">
+
+          <span class="search-icon">
+            ⌕
+          </span>
+
+          <input
+            type="search"
+            name="q"
+            value="{{ query }}"
+            placeholder="Search EBQS or category"
+            aria-label="Search transaction records"
+          />
+
+        </div>
+
+        <button type="submit">
+          Search
+        </button>
+
+      </form>
+
+    </div>
+
+
+    <!-- =========================================
+         TABLE
+         ========================================= -->
+
+    <div class="dashboard-table-wrap">
+
+      <table class="dashboard-table">
+
+        <thead>
+
+          <tr>
+
+            <th>
+              EBQS / Category
+            </th>
+
+            <th>
+              Current Stage
+            </th>
+
+            <th>
+              Received
+            </th>
+
+            
+
+            <th>
+              Outcome
+            </th>
+
+            <th class="table-action-heading">
+              Action
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          {% for item in transactions %}
+
+          <tr>
+
+            <!-- EBQS -->
+
+            <td>
+
+              <div class="record-identity">
+
+                <div class="record-marker">
+                  {{ forloop.counter }}
+                </div>
+
+                <div>
+
+                  <a
+                    href="{% url 'transaction_detail' item.pk %}"
+                    class="record-number"
+                  >
+                    {{ item.ebqs_number }}
+                  </a>
+
+                  <span class="record-category">
+                    {{ item.category }}
+                  </span>
+
+                </div>
+
+              </div>
+
+            </td>
+
+
+            <!-- CURRENT STAGE -->
+
+            <td>
+
+              <span class="dashboard-badge stage">
+                {{ item.current_stage|title }}
+              </span>
+
+            </td>
+
+
+            <!-- RECEIVED -->
+
+            <td>
+
+              <div class="received-date">
+
+                <strong>
+                  {{ item.received_at|date:'M d, Y' }}
+                </strong>
+
+                <span>
+                  {{ item.received_at|date:'g:i A' }}
+                </span>
+
+              </div>
+
+            </td>
+
+            <!-- OUTCOME -->
+
+            <td>
+
+              {% if item.final_label %}
+
+                <span
+                  class="dashboard-badge outcome {{ item.final_label }}"
+                >
+
+                  <span class="badge-dot"></span>
+
+                  {{ item.get_final_label_display }}
+
+                </span>
+
+              {% else %}
+
+                <span class="dashboard-badge pending">
+
+                  <span class="badge-dot"></span>
+
+                  Pending
+
+                </span>
+
+              {% endif %}
+
+            </td>
+
+
+            <!-- ACTION -->
+
+            <td class="table-action">
+
+              <a
+                href="{% url 'transaction_detail' item.pk %}"
+                class="view-record"
+              >
+                View
+                <span>→</span>
+              </a>
+
+            </td>
+
+          </tr>
+
+
+          {% empty %}
+
+          <tr>
+
+            <td
+              colspan="6"
+              class="dashboard-empty"
+            >
+
+              <div class="dashboard-empty-content">
+
+                <div class="empty-record-icon">
+                  +
+                </div>
+
+                <strong>
+                  No transaction records yet
+                </strong>
+
+                <p>
+                  Register the first E-Center transaction
+                  to begin monitoring.
+                </p>
+
+                <a
+                  href="{% url 'transaction_create' %}"
+                  class="dashboard-primary-action"
+                >
+                  Register Transaction
+                </a>
+
+              </div>
+
+            </td>
+
+          </tr>
+
+          {% endfor %}
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+    <!-- =========================================
+         PANEL FOOTER
+         ========================================= -->
+
+    <div class="records-footer">
+
+      <span>
+        {{ counts.total }} total record{{ counts.total|pluralize }}
+      </span>
+
+      <span class="records-privacy">
+        Anonymized research data
+      </span>
+
+    </div>
+
+  </section>
+
+</div>
+
+
+<style>
+
+/* =========================================================
+   EMPLOYEE DASHBOARD
+   ========================================================= */
+
+.employee-dashboard {
+  width: 100%;
+}
+
+
+/* =========================================================
+   PAGE HEADING
+   ========================================================= */
+
+.dashboard-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 30px;
+
+  margin-bottom: 26px;
+}
+
+.dashboard-eyebrow {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: var(--sss-blue);
+
+  font-family:
+    Montserrat,
+    Aptos,
+    sans-serif;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  letter-spacing: 0.09em;
+
+  text-transform: uppercase;
+}
+
+.dashboard-heading h1 {
+  margin: 0 0 6px;
+
+  color: var(--sss-primary);
+
+  font-family:
+    Montserrat,
+    Aptos,
+    sans-serif;
+
+  font-size: 28px;
+  font-weight: 700;
+
+  letter-spacing: -0.5px;
+
+  line-height: 1.2;
+}
+
+.dashboard-heading p {
+  max-width: 650px;
+
+  margin: 0;
+
+  color: var(--muted);
+
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   PRIMARY ACTION
+   ========================================================= */
+
+.dashboard-primary-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  min-height: 42px;
+
+  padding: 9px 17px;
+
+  background: var(--sss-primary);
+
+  border: 1px solid var(--sss-primary);
+  border-radius: 7px;
+
+  color: #fff !important;
+
+  text-decoration: none !important;
+
+  font-family:
+    Montserrat,
+    Aptos,
+    sans-serif;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  white-space: nowrap;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.dashboard-primary-action:hover {
+  background: var(--sss-blue);
+
+  border-color: var(--sss-blue);
+
+  box-shadow:
+    0 5px 14px rgba(43, 79, 155, 0.16);
+}
+
+.action-plus {
+  font-size: 18px;
+  font-weight: 400;
+
+  line-height: 1;
+}
+
+
+/* =========================================================
+   METRICS
+   ========================================================= */
+
+.dashboard-metrics {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 16px;
+
+  margin-bottom: 24px;
+}
+
+.dashboard-metric {
+  position: relative;
+
+  min-width: 0;
+
+  padding: 19px 20px;
+
+  background: #fff;
+
+  border: 1px solid var(--line);
+  border-radius: 10px;
+
+  box-shadow:
+    0 2px 8px rgba(43, 79, 155, 0.045);
+}
+
+.dashboard-metric::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+  right: 0;
+
+  height: 3px;
+
+  background: var(--sss-primary);
+
+  border-radius:
+    10px
+    10px
+    0
+    0;
+}
+
+.metric-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-bottom: 13px;
+}
+
+.metric-label {
+  color: #475467;
+
+  font-size: 12px;
+  font-weight: 650;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.035em;
+}
+
+.metric-status-dot {
+  width: 8px;
+  height: 8px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: var(--sss-primary);
+}
+
+.metric-status-dot.completed {
+  background: var(--sss-green);
+}
+
+.metric-status-dot.delayed {
+  background: var(--sss-red);
+}
+
+.metric-status-dot.total {
+  background: var(--sss-sky);
+}
+
+.metric-value {
+  margin-bottom: 8px;
+
+  color: var(--sss-primary);
+
+  font-family:
+    Montserrat,
+    Aptos,
+    sans-serif;
+
+  font-size: 29px;
+  font-weight: 700;
+
+  line-height: 1;
+}
+
+.metric-footer {
+  overflow: hidden;
+
+  color: var(--muted);
+
+  font-size: 11.5px;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   RECORD PANEL
+   ========================================================= */
+
+.records-panel {
+  overflow: hidden;
+
+  background: #fff;
+
+  border: 1px solid var(--line);
+  border-radius: 12px;
+
+  box-shadow:
+    0 4px 18px rgba(43, 79, 155, 0.055);
+}
+
+
+/* =========================================================
+   RECORD HEADER
+   ========================================================= */
+
+.records-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 30px;
+
+  padding: 20px 22px;
+
+  border-bottom: 1px solid var(--line);
+}
+
+.records-title h2 {
+  margin: 0 0 3px;
+
+  color: var(--sss-primary);
+
+  font-family:
+    Montserrat,
+    Aptos,
+    sans-serif;
+
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.records-title p {
+  margin: 0;
+
+  color: var(--muted);
+
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+.dashboard-search {
+  display: flex;
+
+  width: min(100%, 390px);
+}
+
+.dashboard-search-field {
+  position: relative;
+
+  flex: 1;
+}
+
+.search-icon {
+  position: absolute;
+
+  top: 50%;
+  left: 12px;
+
+  transform: translateY(-50%);
+
+  color: #8997a9;
+
+  font-size: 16px;
+
+  pointer-events: none;
+}
+
+.dashboard-search input {
+  width: 100%;
+  height: 40px;
+
+  padding:
+    8px
+    12px
+    8px
+    35px;
+
+  border: 1px solid #ccd6e2;
+  border-right: 0;
+
+  border-radius:
+    7px
+    0
+    0
+    7px;
+
+  background: #fff;
+
+  color: var(--ink);
+
+  font-size: 13px;
+
+  outline: none;
+}
+
+.dashboard-search input:focus {
+  border-color: var(--sss-primary);
+
+  box-shadow:
+    inset 0 0 0 1px var(--sss-primary);
+}
+
+.dashboard-search button {
+  min-width: 80px;
+
+  border: 0;
+
+  border-radius:
+    0
+    7px
+    7px
+    0;
+
+  background: var(--sss-primary);
+
+  color: #fff;
+
+  font-family:
+    Montserrat,
+    Aptos,
+    sans-serif;
+
+  font-size: 11.5px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.dashboard-search button:hover {
+  background: var(--sss-blue);
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.dashboard-table-wrap {
+  width: 100%;
+
+  overflow-x: auto;
+}
+
+.dashboard-table {
+  width: 100%;
+
+  min-width: 900px;
+
+  border-collapse: collapse;
+
+  font-size: 13px;
+}
+
+.dashboard-table thead {
+  background: var(--sss-pale-blue);
+}
+
+.dashboard-table th {
+  padding: 11px 18px;
+
+  border: 0;
+  border-bottom: 1px solid var(--sss-light-blue);
+
+  background: var(--sss-pale-blue);
+
+  color: var(--sss-primary);
+
+  font-family:
+    Montserrat,
+    Aptos,
+    sans-serif;
+
+  font-size: 10.5px;
+  font-weight: 700;
+
+  letter-spacing: 0.045em;
+
+  text-align: left;
+  text-transform: uppercase;
+
+  white-space: nowrap;
+}
+
+.dashboard-table td {
+  padding: 14px 18px;
+
+  border: 0;
+  border-bottom: 1px solid #edf1f5;
+
+  color: #344054;
+
+  vertical-align: middle;
+}
+
+.dashboard-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.dashboard-table tbody tr:hover {
+  background: #f8fbfe;
+}
+
+.dashboard-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+
+/* =========================================================
+   RECORD IDENTITY
+   ========================================================= */
+
+.record-identity {
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+}
+
+.record-marker {
+  width: 30px;
+  height: 30px;
+
+  flex-shrink: 0;
+
+  display: grid;
+  place-items: center;
+
+  background: var(--sss-pale-blue);
+
+  border: 1px solid var(--sss-light-blue);
+  border-radius: 6px;
+
+  color: var(--sss-primary);
+
+  font-family:
+    Montserrat,
+    Aptos,
+    sans-serif;
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.record-number {
+  display: block;
+
+  color: var(--sss-primary) !important;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  text-decoration: none !important;
+}
+
+.record-number:hover {
+  color: var(--sss-blue) !important;
+}
+
+.record-category {
+  display: block;
+
+  margin-top: 2px;
+
+  color: var(--muted);
+
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   RECEIVED DATE
+   ========================================================= */
+
+.received-date strong,
+.received-date span {
+  display: block;
+}
+
+.received-date strong {
+  color: #344054;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.received-date span {
+  margin-top: 2px;
+
+  color: var(--muted);
+
+  font-size: 10.5px;
+}
+
+
+/* =========================================================
+   THRESHOLD
+   ========================================================= */
+
+.threshold-value {
+  color: #475467;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   BADGES
+   ========================================================= */
+
+.dashboard-badge {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 4px 8px;
+
+  border-radius: 999px;
+
+  font-size: 10.5px;
+  font-weight: 650;
+
+  white-space: nowrap;
+}
+
+.dashboard-badge.stage {
+  background: var(--sss-pale-blue);
+
+  border: 1px solid var(--sss-light-blue);
+
+  color: var(--sss-primary);
+}
+
+.dashboard-badge.pending {
+  background: #f5f6f7;
+
+  border: 1px solid #e1e5ea;
+
+  color: #667085;
+}
+
+.dashboard-badge.on_time {
+  background: #e8f5ef;
+
+  border: 1px solid #c8e7d9;
+
+  color: #31745b;
+}
+
+.dashboard-badge.delayed {
+  background: #fbedee;
+
+  border: 1px solid #f0c9cc;
+
+  color: var(--sss-red);
+}
+
+.badge-dot {
+  width: 5px;
+  height: 5px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: currentColor;
+}
+
+
+/* =========================================================
+   VIEW ACTION
+   ========================================================= */
+
+.table-action-heading,
+.table-action {
+  text-align: right !important;
+}
+
+.view-record {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 5px;
+
+  color: var(--sss-primary) !important;
+
+  text-decoration: none !important;
+
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.view-record:hover {
+  color: var(--sss-blue) !important;
+}
+
+.view-record span {
+  transition: transform 0.15s ease;
+}
+
+.view-record:hover span {
+  transform: translateX(2px);
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.dashboard-empty {
+  padding: 55px 20px !important;
+
+  text-align: center;
+}
+
+.dashboard-empty-content {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+
+  max-width: 330px;
+
+  margin: auto;
+}
+
+.empty-record-icon {
+  width: 42px;
+  height: 42px;
+
+  display: grid;
+  place-items: center;
+
+  margin-bottom: 12px;
+
+  background: var(--sss-pale-blue);
+
+  border: 1px solid var(--sss-light-blue);
+  border-radius: 50%;
+
+  color: var(--sss-primary);
+
+  font-size: 21px;
+}
+
+.dashboard-empty-content strong {
+  color: var(--sss-primary);
+
+  font-family:
+    Montserrat,
+    Aptos,
+    sans-serif;
+
+  font-size: 14px;
+}
+
+.dashboard-empty-content p {
+  margin: 5px 0 16px;
+
+  color: var(--muted);
+
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.records-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 11px 18px;
+
+  background: #fafbfd;
+
+  border-top: 1px solid var(--line);
+
+  color: var(--muted);
+
+  font-size: 10.5px;
+}
+
+.records-privacy {
+  color: var(--sss-blue);
+
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 950px) {
+
+  .dashboard-metrics {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .dashboard-heading {
+    align-items: stretch;
+
+    flex-direction: column;
+
+    gap: 17px;
+  }
+
+  .dashboard-heading h1 {
+    font-size: 23px;
+  }
+
+  .dashboard-heading-actions {
+    display: flex;
+  }
+
+  .dashboard-primary-action {
+    width: 100%;
+  }
+
+  .dashboard-metrics {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+  }
+
+  .dashboard-metric {
+    padding: 16px;
+  }
+
+  .metric-value {
+    font-size: 25px;
+  }
+
+  .metric-footer {
+    white-space: normal;
+  }
+
+  .records-header {
+    align-items: stretch;
+
+    flex-direction: column;
+
+    gap: 15px;
+
+    padding: 18px;
+  }
+
+  .dashboard-search {
+    width: 100%;
+  }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+  .dashboard-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .records-footer {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 4px;
+  }
+
+}
+
+</style>
+
 {% endblock %}

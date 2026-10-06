@@ -1,1 +1,397 @@
-<!doctype html><html><head><meta name="viewport" content="width=device-width"><title>Sign in</title><style>body{font-family:system-ui;background:#eef4f7;display:grid;place-items:center;min-height:100vh;color:#102a33}.box{background:white;padding:2rem;border-radius:18px;width:min(360px,85vw);box-shadow:0 15px 40px #1232}input{box-sizing:border-box;width:100%;padding:.75rem;margin:.35rem 0 1rem;border:1px solid #bdd;border-radius:8px}button{width:100%;padding:.8rem;background:#0b766e;color:white;border:0;border-radius:8px;font-weight:700}</style></head><body><form class="box" method="post">{% csrf_token %}<h1>Staff sign in</h1>{{ form.as_p }}<button>Sign in</button></form></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+
+    <title>SSSential | Staff Sign In</title>
+
+    <style>
+      :root {
+        /* =========================================
+           SSS CORPORATE COLORS
+           ========================================= */
+
+        --sss-primary: #2b4f9b;       /* Cerulean Cascade */
+        --sss-blue: #3873b6;          /* Marine Mirage */
+        --sss-sky: #77c4e9;           /* Sapphire Skyline */
+        --sss-light-blue: #d3ebf6;    /* Bluebell Breeze */
+        --sss-pale-blue: #e7f4fc;     /* Harbor Haze */
+
+        --white: #ffffff;
+        --background: #f7fafc;
+
+        --text: #1f2937;
+        --muted: #667085;
+        --border: #d7e0ea;
+
+        --error: #bd303b;             /* Cardinal Crest */
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        min-height: 100vh;
+
+        font-family:
+          Aptos,
+          "Segoe UI",
+          Arial,
+          sans-serif;
+
+        background:
+          linear-gradient(
+            135deg,
+            var(--pale-blue) 0%,
+            #ffffff 55%,
+            var(--light-blue) 100%
+          );
+
+        color: var(--text);
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 24px;
+      }
+
+      /* =========================================
+         LOGIN CONTAINER
+         ========================================= */
+
+      .login-container {
+        width: 100%;
+        max-width: 430px;
+      }
+
+      /* =========================================
+         BRAND
+         ========================================= */
+
+      .brand {
+        text-align: center;
+        margin-bottom: 24px;
+      }
+
+      .brand-mark {
+        width: 64px;
+        height: 64px;
+
+        margin: 0 auto 14px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background: var(--sss-primary);
+
+        color: white;
+
+        border-radius: 14px;
+
+        font-family:
+          Montserrat,
+          Aptos,
+          sans-serif;
+
+        font-size: 25px;
+        font-weight: 800;
+
+        letter-spacing: -1px;
+
+        box-shadow: 0 8px 22px rgba(43, 79, 155, 0.18);
+      }
+
+      .brand h1 {
+        margin: 0;
+
+        font-family:
+          Montserrat,
+          Aptos,
+          sans-serif;
+
+        color: var(--sss-primary);
+
+        font-size: 30px;
+        font-weight: 700;
+        letter-spacing: -0.7px;
+      }
+
+      .brand p {
+        margin: 6px 0 0;
+
+        color: var(--muted);
+
+        font-size: 14px;
+      }
+
+      /* =========================================
+         LOGIN CARD
+         ========================================= */
+
+      .login-card {
+        background: var(--white);
+
+        border: 1px solid rgba(43, 79, 155, 0.12);
+        border-radius: 16px;
+
+        padding: 34px;
+
+        box-shadow:
+          0 20px 50px rgba(43, 79, 155, 0.08),
+          0 3px 10px rgba(0, 0, 0, 0.03);
+      }
+
+      .login-card h2 {
+        margin: 0 0 6px;
+
+        color: var(--sss-primary);
+
+        font-family:
+          Montserrat,
+          Aptos,
+          sans-serif;
+
+        font-size: 22px;
+        font-weight: 700;
+      }
+
+      .login-subtitle {
+        margin: 0 0 28px;
+
+        color: var(--muted);
+
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      /* =========================================
+         DJANGO FORM
+         ========================================= */
+
+      .login-card p {
+        margin: 0 0 18px;
+      }
+
+      .login-card label {
+        display: block;
+
+        margin-bottom: 7px;
+
+        color: #344054;
+
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .login-card input {
+        display: block;
+
+        width: 100%;
+        height: 46px;
+
+        padding: 0 14px;
+
+        border: 1px solid var(--border);
+        border-radius: 8px;
+
+        background: white;
+
+        color: var(--text);
+
+        font-family:
+          Aptos,
+          "Segoe UI",
+          Arial,
+          sans-serif;
+
+        font-size: 15px;
+
+        outline: none;
+
+        transition:
+          border-color 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .login-card input:hover {
+        border-color: #aabbd1;
+      }
+
+      .login-card input:focus {
+        border-color: var(--sss-primary);
+
+        box-shadow:
+          0 0 0 3px rgba(43, 79, 155, 0.12);
+      }
+
+      /* =========================================
+         SIGN IN BUTTON
+         ========================================= */
+
+      .sign-in-button {
+        width: 100%;
+        height: 48px;
+
+        margin-top: 6px;
+
+        border: none;
+        border-radius: 8px;
+
+        background: var(--sss-primary);
+
+        color: white;
+
+        font-family:
+          Montserrat,
+          Aptos,
+          sans-serif;
+
+        font-size: 15px;
+        font-weight: 700;
+
+        cursor: pointer;
+
+        transition:
+          background 0.2s ease,
+          transform 0.1s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .sign-in-button:hover {
+        background: var(--sss-blue);
+
+        box-shadow: 0 7px 18px rgba(43, 79, 155, 0.2);
+      }
+
+      .sign-in-button:active {
+        transform: translateY(1px);
+      }
+
+      /* =========================================
+         ERRORS
+         ========================================= */
+
+      .errorlist {
+        margin: 0 0 16px;
+        padding: 12px 14px;
+
+        list-style: none;
+
+        background: rgba(189, 48, 59, 0.07);
+
+        border-left: 4px solid var(--error);
+        border-radius: 6px;
+
+        color: var(--error);
+
+        font-size: 13px;
+      }
+
+      /* =========================================
+         FOOTER
+         ========================================= */
+
+      .login-footer {
+        margin-top: 22px;
+
+        text-align: center;
+
+        color: var(--muted);
+
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      .login-footer strong {
+        color: var(--sss-primary);
+      }
+
+      /* =========================================
+         MOBILE
+         ========================================= */
+
+      @media (max-width: 480px) {
+        body {
+          padding: 16px;
+        }
+
+        .login-card {
+          padding: 27px 22px;
+        }
+
+        .brand h1 {
+          font-size: 27px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <main class="login-container">
+
+      <header class="brand">
+
+        <div class="brand-mark">
+          SSS
+        </div>
+
+        <h1>SSSential</h1>
+
+        <p>
+          Transaction Status Monitoring System
+        </p>
+
+      </header>
+
+
+      <form
+        class="login-card"
+        method="post"
+      >
+
+        {% csrf_token %}
+
+        <center><h2>Staff Sign In</h2></center>
+
+        <p class="login-subtitle">
+          Sign in using your authorized staff account
+          to access the SSSential system.
+        </p>
+
+        {{ form.as_p }}
+
+        <button
+          type="submit"
+          class="sign-in-button"
+        >
+          Sign In
+        </button>
+
+      </form>
+
+
+      <footer class="login-footer">
+
+  
+
+      </footer>
+
+    </main>
+
+  </body>
+</html>

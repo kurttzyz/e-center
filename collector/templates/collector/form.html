@@ -1,1 +1,792 @@
-{% extends 'collector/base.html' %}{% block title %}{{ title }}{% endblock %}{% block content %}<section class="form-card"><a href="javascript:history.back()">← Back</a><h1>{{ title }}</h1><p>Do not enter names, SSS numbers, contact details, or other personal information.</p><form method="post">{% csrf_token %}{{ form.as_p }}<button class="primary">{{ submit_label }}</button></form></section>{% endblock %}
+{% extends 'collector/base.html' %}
+
+{% block title %}
+  {{ title }} | SSSential
+{% endblock %}
+
+{% block content %}
+
+<div class="form-page">
+
+  <section class="form-card modern-form-card">
+
+    <!-- Back -->
+    <div class="form-navigation">
+      <a href="javascript:history.back()" class="back-link">
+        <span aria-hidden="true"><</span>
+        Back
+      </a>
+    </div>
+
+
+    <!-- Header -->
+    <div class="form-header">
+
+      <div>
+        <span class="form-eyebrow">SSSential</span>
+
+        <h1>{{ title }}</h1>
+
+        <p>
+          Complete the transaction information below.
+          Required fields must be provided before continuing.
+        </p>
+      </div>
+
+    </div>
+
+
+    <!-- Privacy Notice -->
+    <div class="privacy-notice">
+
+      <div class="privacy-icon">!</div>
+
+      <div>
+        <strong>Privacy Reminder</strong>
+
+        <p>
+          Do not enter names, SSS numbers, contact details,
+          or other personal information.
+        </p>
+      </div>
+
+    </div>
+
+
+    <!-- Form -->
+    <form method="post" class="transaction-form">
+
+      {% csrf_token %}
+
+      <div class="form-section-header">
+        <div>
+          <h2>Transaction Information</h2>
+          <p>Enter the required E-Center transaction details.</p>
+        </div>
+
+        <span class="required-note">
+          * Required fields
+        </span>
+      </div>
+
+
+      <!--
+        Django form.as_p generates:
+
+        <p>
+          <label>...</label>
+          <input>
+        </p>
+
+        CSS Grid automatically turns these into
+        a responsive two-column layout.
+      -->
+      <div class="form-grid">
+        {{ form.as_p }}
+      </div>
+
+
+      <!-- Actions -->
+      <div class="form-actions">
+
+        <a
+          href="javascript:history.back()"
+          class="cancel-button"
+        >
+          Cancel
+        </a>
+
+        <button
+          type="submit"
+          class="primary form-submit"
+        >
+          {{ submit_label }}
+          <span aria-hidden="true"></span>
+        </button>
+
+      </div>
+
+    </form>
+
+  </section>
+
+</div>
+
+<style>
+    /* =========================================================
+   SSSENTIAL — MODERN TWO-COLUMN FORM
+   ========================================================= */
+
+.form-page {
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+
+  padding: 8px 0 40px;
+}
+
+
+/* =========================================================
+   CARD
+   ========================================================= */
+
+.modern-form-card {
+  width: 100%;
+  max-width: 940px;
+
+  margin: 0;
+  padding: 0;
+
+  overflow: hidden;
+
+  background: var(--white);
+
+  border: 1px solid var(--line);
+  border-radius: 14px;
+
+  box-shadow:
+    0 8px 30px rgba(43, 79, 155, 0.07);
+}
+
+
+/* =========================================================
+   BACK
+   ========================================================= */
+
+.form-navigation {
+  padding: 18px 32px 0;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 7px;
+
+  color: var(--sss-primary) !important;
+
+  text-decoration: none !important;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.back-link:hover {
+  color: var(--sss-blue) !important;
+
+  transform: translateX(-2px);
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.form-header {
+  padding: 20px 32px 22px;
+}
+
+.form-eyebrow {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: var(--sss-blue);
+
+  font-family:
+    Montserrat,
+    Aptos,
+    sans-serif;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+}
+
+.form-header h1 {
+  margin: 0 0 7px;
+
+  color: var(--sss-primary);
+
+  font-family:
+    Montserrat,
+    Aptos,
+    sans-serif;
+
+  font-size: 27px;
+  font-weight: 700;
+
+  line-height: 1.25;
+
+  letter-spacing: -0.4px;
+}
+
+.form-header p {
+  max-width: 620px;
+
+  margin: 0;
+
+  color: var(--muted);
+
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   PRIVACY NOTICE
+   ========================================================= */
+
+.privacy-notice {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  margin: 0 32px 26px;
+
+  padding: 13px 15px;
+
+  background: var(--sss-pale-blue);
+
+  border: 1px solid var(--sss-light-blue);
+  border-radius: 8px;
+}
+
+.privacy-icon {
+  width: 27px;
+  height: 27px;
+
+  flex-shrink: 0;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background: var(--sss-primary);
+
+  color: var(--white);
+
+  font-family:
+    Montserrat,
+    Aptos,
+    sans-serif;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.privacy-notice strong {
+  display: block;
+
+  margin-bottom: 1px;
+
+  color: var(--sss-primary);
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.privacy-notice p {
+  margin: 0;
+
+  color: #53667c;
+
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.transaction-form {
+  border-top: 1px solid var(--line);
+}
+
+
+/* =========================================================
+   SECTION HEADER
+   ========================================================= */
+
+.form-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 20px 32px 17px;
+
+  background: #fafbfd;
+
+  border-bottom: 1px solid #edf1f5;
+}
+
+.form-section-header h2 {
+  margin: 0 0 2px;
+
+  color: var(--sss-primary);
+
+  font-family:
+    Montserrat,
+    Aptos,
+    sans-serif;
+
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.form-section-header p {
+  margin: 0;
+
+  color: var(--muted);
+
+  font-size: 12px;
+}
+
+.required-note {
+  flex-shrink: 0;
+
+  color: var(--muted);
+
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   TWO-COLUMN GRID
+   ========================================================= */
+
+.form-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  column-gap: 24px;
+  row-gap: 19px;
+
+  padding: 26px 32px 30px;
+}
+
+
+/*
+   Django form.as_p places every field inside <p>.
+*/
+
+.form-grid > p {
+  margin: 0;
+
+  min-width: 0;
+}
+
+
+/* =========================================================
+   LABELS
+   ========================================================= */
+
+.form-grid label {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #344054;
+
+  font-size: 13px;
+  font-weight: 650;
+}
+
+
+/* =========================================================
+   INPUTS
+   ========================================================= */
+
+.form-grid input,
+.form-grid select,
+.form-grid textarea {
+  display: block;
+
+  width: 100%;
+
+  min-height: 44px;
+
+  padding: 10px 12px;
+
+  background: var(--white);
+
+  border: 1px solid #cfd8e3;
+  border-radius: 7px;
+
+  color: var(--ink);
+
+  font-family:
+    Aptos,
+    "Segoe UI",
+    Arial,
+    sans-serif;
+
+  font-size: 14px;
+
+  outline: none;
+
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+}
+
+.form-grid input:hover,
+.form-grid select:hover,
+.form-grid textarea:hover {
+  border-color: #aabbd1;
+}
+
+.form-grid input:focus,
+.form-grid select:focus,
+.form-grid textarea:focus {
+  border-color: var(--sss-primary);
+
+  box-shadow:
+    0 0 0 3px rgba(43, 79, 155, 0.1);
+}
+
+
+/* =========================================================
+   SELECT
+   ========================================================= */
+
+.form-grid select {
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   TEXTAREA
+
+   A textarea usually contains longer information,
+   so its field automatically spans both columns.
+   ========================================================= */
+
+.form-grid > p:has(textarea) {
+  grid-column: 1 / -1;
+}
+
+.form-grid textarea {
+  min-height: 105px;
+
+  resize: vertical;
+}
+
+
+/* =========================================================
+   FILE INPUT
+
+   File fields also get full width.
+   ========================================================= */
+
+.form-grid > p:has(input[type="file"]) {
+  grid-column: 1 / -1;
+}
+
+
+/* =========================================================
+   CHECKBOX / RADIO
+   ========================================================= */
+
+.form-grid input[type="checkbox"],
+.form-grid input[type="radio"] {
+  display: inline-block;
+
+  width: 17px;
+  height: 17px;
+
+  min-height: auto;
+
+  margin-right: 6px;
+
+  accent-color: var(--sss-primary);
+
+  box-shadow: none;
+}
+
+
+/* =========================================================
+   PLACEHOLDER
+   ========================================================= */
+
+.form-grid input::placeholder,
+.form-grid textarea::placeholder {
+  color: #98a2b3;
+}
+
+
+/* =========================================================
+   HELP TEXT
+   ========================================================= */
+
+.form-grid .helptext {
+  display: block;
+
+  margin-top: 6px;
+
+  color: var(--muted);
+
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+
+
+/* =========================================================
+   ERRORS
+   ========================================================= */
+
+.form-grid .errorlist {
+  margin: 0 0 7px;
+
+  padding: 8px 11px;
+
+  list-style: none;
+
+  background: #fbedee;
+
+  border: 1px solid #f0c9cc;
+  border-left: 3px solid var(--sss-red);
+
+  border-radius: 6px;
+
+  color: var(--sss-red);
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   ACTION BAR
+   ========================================================= */
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  padding: 18px 32px;
+
+  background: #fafbfd;
+
+  border-top: 1px solid var(--line);
+}
+
+
+/* =========================================================
+   CANCEL
+   ========================================================= */
+
+.cancel-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 42px;
+
+  padding: 9px 18px;
+
+  background: var(--white);
+
+  border: 1px solid var(--line);
+  border-radius: 7px;
+
+  color: #475467 !important;
+
+  text-decoration: none !important;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.cancel-button:hover {
+  background: #f5f7fa;
+
+  border-color: #b9c6d5;
+}
+
+
+/* =========================================================
+   SUBMIT
+   ========================================================= */
+
+.form-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 9px;
+
+  min-height: 42px;
+
+  padding: 9px 20px;
+
+  border: 0;
+  border-radius: 7px;
+
+  background: var(--sss-primary);
+
+  color: var(--white);
+
+  font-family:
+    Montserrat,
+    Aptos,
+    sans-serif;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.1s ease;
+}
+
+.form-submit:hover {
+  background: var(--sss-blue);
+
+  box-shadow:
+    0 5px 14px rgba(43, 79, 155, 0.18);
+}
+
+.form-submit:active {
+  transform: translateY(1px);
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+  .modern-form-card {
+    max-width: 680px;
+  }
+
+  .form-grid {
+    column-gap: 18px;
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE
+
+   Two columns automatically become one.
+   ========================================================= */
+
+@media (max-width: 650px) {
+
+  .modern-form-card {
+    border-radius: 10px;
+  }
+
+  .form-navigation {
+    padding:
+      17px
+      20px
+      0;
+  }
+
+  .form-header {
+    padding:
+      18px
+      20px
+      20px;
+  }
+
+  .form-header h1 {
+    font-size: 22px;
+  }
+
+  .privacy-notice {
+    margin:
+      0
+      20px
+      20px;
+  }
+
+  .form-section-header {
+    align-items: flex-start;
+
+    padding:
+      17px
+      20px;
+
+    flex-direction: column;
+
+    gap: 5px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+
+    gap: 18px;
+
+    padding:
+      22px
+      20px
+      26px;
+  }
+
+  .form-grid > p:has(textarea),
+  .form-grid > p:has(input[type="file"]) {
+    grid-column: auto;
+  }
+
+  .form-actions {
+    padding:
+      16px
+      20px;
+  }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+  .form-actions {
+    flex-direction: column-reverse;
+
+    align-items: stretch;
+  }
+
+  .cancel-button,
+  .form-submit {
+    width: 100%;
+  }
+
+}
+</style>
+
+{% endblock %}

@@ -8,6 +8,53 @@ from django.db import models
 from django.utils import timezone
 
 
+
+class EmployeeProfile(models.Model):
+
+    ROLE_CHOICES = [
+        ("ojt", "OJT"),
+        ("employee", "Employee"),
+        ("supervisor", "Supervisor"),
+        ("admin", "Administrator"),
+    ]
+
+    EMPLOYEE_TYPE_CHOICES = [
+        ("ojt", "OJT"),
+        ("regular", "Regular Employee"),
+        ("contractual", "Contractual"),
+    ]
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="profile",
+    )
+
+    position = models.CharField(
+        max_length=100,
+        blank=True,
+    )
+
+    office = models.CharField(
+        max_length=100,
+        default="E-Center",
+    )
+
+    role = models.CharField(
+        max_length=20,
+        choices=ROLE_CHOICES,
+        default="employee",
+    )
+
+    employee_type = models.CharField(
+        max_length=20,
+        choices=EMPLOYEE_TYPE_CHOICES,
+        default="ojt",
+    )
+
+    def __str__(self):
+        return self.user.get_full_name() or self.user.username
+
 def generate_passkey():
     characters = string.ascii_uppercase + string.digits
     return "".join(secrets.choice(characters) for _ in range(8))
@@ -81,7 +128,8 @@ class Service(models.Model):
 
     threshold_minutes = models.PositiveIntegerField(
         default=30,
-        help_text="Approved processing-time threshold in minutes"
+        help_text="Approved processing-time threshold in minutes",
+        null=True,
     )
 
     is_online = models.BooleanField(
@@ -243,7 +291,9 @@ class Transaction(models.Model):
     )
 
     threshold_minutes = models.PositiveIntegerField(
-        help_text="Approved category threshold in minutes"
+        help_text="Approved category threshold in minutes",
+        null=True,
+        blank=True
     )
 
     current_stage = models.CharField(
@@ -274,7 +324,9 @@ class Transaction(models.Model):
         choices=[
             ("on_time", "On time"),
             ("delayed", "Delayed")
-        ]
+        ],
+        null=True,
+  
     )
 
     notes = models.TextField(blank=True)
