@@ -52,3 +52,60 @@
   </li>
 
 </ol>
+
+<style>
+  .steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3rem;
+
+    width: 100%;
+    margin: 0 auto 2rem;
+    padding: 0;
+
+    list-style: none;
+}
+
+.steps li {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.steps li span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+
+    border-radius: 50%;
+}
+
+/* Steps that cannot be accessed yet */
+.steps li.disabled {
+    opacity: 0.35;
+    cursor: default;
+    pointer-events: none;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .steps {
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .steps li {
+        font-size: 0.85rem;
+    }
+
+    .steps li span {
+        width: 32px;
+        height: 32px;
+    }
+}
+</style>
