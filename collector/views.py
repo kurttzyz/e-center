@@ -12,7 +12,7 @@ from django.db.models import Count, Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-
+from .models import ServiceCategory
 from .forms import CompletionForm, EventForm, TransactionForm
 from .models import Transaction, TransactionEvent
 
@@ -87,8 +87,23 @@ def home(request):
 
 
 def services(request):
-    return render(request, "portal/services.html", {"services": SERVICES})
+    categories = (
+        ServiceCategory.objects
+        .filter(
+            is_active=True,
+            services__is_active=True,
+        )
+        .prefetch_related("services")
+        .distinct()
+    )
 
+    return render(
+        request,
+        "portal/services.html",
+        {
+            "categories": categories,
+        },
+    )
 
 def scan_qr(request):
     if request.method == "POST":
@@ -143,17 +158,17 @@ def transaction_status(request, tracking_id):
         }
     )
 
-# def transaction(request):
-#     if request.method == "POST":
-#         tracking_id = f"ECT-{uuid4().hex[:10].upper()}"
-#         request.session["tracking_id"] = tracking_id
-#         request.session["transaction_type"] = request.POST.get("transaction_type", "E-Center Assistance")
-#         return redirect("qr_result")
-#     return render(request, "portal/transaction.html", {
-#         "member": {"reference": "•••••••678", "name": "Sample Member"},
-#         "submitted": ["Valid government-issued ID", "Member information form"],
-#         "lacking": ["Validated deposit slip with visible name and account number"],
-#     })
+def transaction(request):
+    # if request.method == "POST":
+    #     tracking_id = f"ECT-{uuid4().hex[:10].upper()}"
+    #     request.session["tracking_id"] = tracking_id
+    #     request.session["transaction_type"] = request.POST.get("transaction_type", "E-Center Assistance")
+    #     return redirect("qr_result")
+    return render(request, "portal/transaction.html", {
+        # "member": {"reference": "•••••••678", "name": "Sample Member"},
+        # "submitted": ["Valid government-issued ID", "Member information form"],
+        # "lacking": ["Validated deposit slip with visible name and account number"],
+    })
 
 
 # def qr_result(request):

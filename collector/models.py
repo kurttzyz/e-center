@@ -13,6 +13,166 @@ def generate_passkey():
     return "".join(secrets.choice(characters) for _ in range(8))
 
 
+class ServiceCategory(models.Model):
+    name = models.CharField(
+        max_length=120,
+        unique=True
+    )
+
+    description = models.TextField(
+        blank=True
+    )
+
+    icon = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text="Optional icon name"
+    )
+
+    display_order = models.PositiveIntegerField(
+        default=0
+    )
+
+    is_active = models.BooleanField(
+        default=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    class Meta:
+        ordering = ["display_order", "name"]
+        verbose_name_plural = "Service categories"
+
+    def __str__(self):
+        return self.name
+
+
+class Service(models.Model):
+    category = models.ForeignKey(
+        ServiceCategory,
+        on_delete=models.PROTECT,
+        related_name="services"
+    )
+
+    name = models.CharField(
+        max_length=200
+    )
+
+    code = models.SlugField(
+        max_length=100,
+        unique=True,
+        db_index=True
+    )
+
+    description = models.TextField(
+        blank=True
+    )
+
+    instructions = models.TextField(
+        blank=True,
+        help_text="Instructions shown to the client before proceeding"
+    )
+
+    threshold_minutes = models.PositiveIntegerField(
+        default=30,
+        help_text="Approved processing-time threshold in minutes"
+    )
+
+    is_online = models.BooleanField(
+        default=True,
+        help_text="Service can be assisted through the E-Center/My.SSS"
+    )
+
+    is_active = models.BooleanField(
+        default=True
+    )
+
+    display_order = models.PositiveIntegerField(
+        default=0
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    class Meta:
+        ordering = [
+            "category__display_order",
+            "display_order",
+            "name"
+        ]
+
+    def __str__(self):
+        return self.name
+
+
+class ServiceRequirement(models.Model):
+    class RequirementType(models.TextChoices):
+        DOCUMENT = "document", "Document"
+        ACCOUNT = "account", "Account prerequisite"
+        ELIGIBILITY = "eligibility", "Eligibility condition"
+        INFORMATION = "information", "Information"
+        OTHER = "other", "Other"
+
+    service = models.ForeignKey(
+        Service,
+        on_delete=models.CASCADE,
+        related_name="requirements",
+        null=True,
+        blank=True,
+    )
+
+    requirement_type = models.CharField(
+        max_length=20,
+        choices=RequirementType.choices,
+        default=RequirementType.DOCUMENT
+    )
+
+    name = models.CharField(
+        max_length=255
+    )
+
+    description = models.TextField(
+        blank=True
+    )
+
+    is_required = models.BooleanField(
+        default=True
+    )
+
+    display_order = models.PositiveIntegerField(
+        default=0
+    )
+
+    is_active = models.BooleanField(
+        default=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    class Meta:
+        ordering = ["display_order", "name"]
+
+    def __str__(self):
+        return f"{self.service.name} — {self.name}"
+
+
 class Transaction(models.Model):
     class Requirements(models.TextChoices):
         COMPLETE = "complete", "Complete and accepted"
@@ -56,9 +216,12 @@ class Transaction(models.Model):
         db_index=True
     )
 
-    category = models.CharField(
-        max_length=120,
-        db_index=True
+    service = models.ForeignKey(
+        Service,
+        on_delete=models.PROTECT,
+        related_name="transactions",
+        null=True,
+        blank=True,
     )
 
     requirements_status = models.CharField(
@@ -133,8 +296,8 @@ class Transaction(models.Model):
     class Meta:
         ordering = ["-updated_at"]
 
-    def __str__(self):
-        return f"{self.ebqs_number} — {self.category}"
+        def __str__(self):
+            return f"{self.ebqs_number} — {self.service.name}"
 
     def save(self, *args, **kwargs):
         if not self.tracking_id:
